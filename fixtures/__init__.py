@@ -1,0 +1,1 @@
+"""Paquete para fixtures de datos reutilizables."""

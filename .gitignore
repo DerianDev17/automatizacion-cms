@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pdb
+*.egg-info/
+.eggs/
+*.egg
+
+# VSCode
+.vscode/
+.settings/
+
+# Playwright
+playwright-report/
+
+# pytest
+.cache/
+.pytest_cache/
+
+# Archivos temporales
+*.log
+*.tmp
+*.bak
+*.swp
+.DS_Store
+Thumbs.db
+
+# Entornos virtuales
+venv/
+.env/
+ENV/
+.venv/
+
+# Archivos de sistema
+*.orig
+*.rej
+
+# Archivos de salida
+*.html
+*.png
+*.webm
+*.pdf
+*.xlsx
+*.csv
+
+# Otros
+node_modules/
+
+# Reportes y artefactos
+cms_automation/reports/
+cms_automation/artefacts/
+cms_automation/videos/

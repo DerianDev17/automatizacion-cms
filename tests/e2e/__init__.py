@@ -1,0 +1,1 @@
+"""Paquete de tests end‑to‑end."""
