@@ -1,3 +1,45 @@
+# Documentación del proyecto cms_automation
+
+Este documento resume el estado del proyecto y las guías rápidas para
+extender y mantener las automatizaciones centradas en Consultas y
+Reportes del CMS.
+
+Estado de módulos (resumen)
+
+Implementados
+
+- CM14 — Trazabilidad (`pages/cm14_trazabilidad_page.py`, `tests/e2e/test_cm14_trazabilidad.py`)
+- CM16 — Tarjeta por Cuenta
+- CM18 — Tarjetas por Opción
+
+Pendientes / Placeholders
+
+- CM17, CM87, CM88, CM89, CM97, CMA4, MD16 — hay clases placeholder en `pages/placeholders.py` y tests esqueleto en `tests/e2e/test_placeholders.py`.
+
+Diseño y buenas prácticas
+
+- Page Object Model (POM): cada archivo en `pages/` debe exponer acciones de alto nivel (abrir, buscar, exportar, validar).
+- Fixtures: `conftest.py` expone `config`, `browser/context/page` y `login`.
+- Selectores: centralizar selectores reutilizables en `utils/selectors.py`.
+
+Contrato mínimo de un Page Object
+
+- Inputs: `page` (Playwright) y parámetros de negocio (número de tarjeta, rango de fechas).
+- Outputs: resultados visibles (tabla) y/o archivos generados.
+- Errores: lanzar excepción clara cuando la página no carga o faltan elementos.
+
+Cómo extender el proyecto (pasos rápidos)
+
+1. Crear o completar un Page Object en `pages/`. Mantén métodos pequeños y descriptivos.
+2. Añadir un test en `tests/e2e/` que use la fixture `login` para autenticarse y navegar.
+3. Marcar el test con `@pytest.mark.cmXX` y validar localmente.
+4. Agregar selectores compartidos a `utils/selectors.py` si aplican.
+
+Notas
+
+- Prioriza el uso de `data-testid` en la aplicación para selectores estables.
+- Mantén la documentación actualizada al completar módulos.
+- Para cambios mayores (por ejemplo, reorganizar `pages/`), actualiza este archivo y `README.md`.
 # Documentación del proyecto de automatización CMS
 
 ## Introducción

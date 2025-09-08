@@ -46,97 +46,86 @@ cms_automation/
 │   └── api/
 │       ├── __init__.py
 │       ├── test_ws01_movimientos_switch.py
-│       └── test_ws02_consulta_transacciones.py
-├── utils/
-│   ├── __init__.py
-│   ├── selectors.py         # Selectores centralizados (data-testids, labels)
-│   ├── waits.py             # Funciones de espera robustas
-│   ├── files.py             # Gestión de descargas y archivos exportados
-│   └── auth.py              # Ayudas para login y refresco de sesión
-├── docs/
-│   ├── usage.md             # Instrucciones para ejecutar las pruebas
-│   └── project_doc.md       # Documentación detallada del proyecto y de los módulos
-└── fixtures/
-    └── __init__.py         # Lugar para generadores de datos reutilizables
+# CMS Automation (cms_automation)
 
+Repositorio con las automatizaciones end-to-end para los módulos de Consultas y Reportes del Card Management System (CMS).
+
+Resumen rápido
+- Lenguajes y herramientas: Python, pytest, Playwright.
+- Objetivo: pruebas E2E mantenibles usando Page Objects y fixtures reutilizables.
+
+Estructura relevante
+
+- `config/` — archivos YAML por entorno (`qa.yaml` por defecto).
+- `pages/` — Page Objects que encapsulan interacciones UI.
+- `tests/e2e/` — pruebas end-to-end por módulo.
+- `tests/api/` — pruebas de servicios web (esqueletos actualmente).
+- `utils/` — utilidades (selectores, waits, archivos, auth).
+- `docs/` — documentación del proyecto (esta carpeta).
+
+Principales puntos
+
+- Pattern: Page Object Model (POM) — cada `pages/*` expone acciones de alto nivel.
+- Fixtures globales en `conftest.py` para inicializar Playwright, cargar configuración y manejar login.
+- Selectores centralizados en `utils/selectors.py` para facilitar mantenimiento.
+
+Instalación (Windows / PowerShell)
+
+1. Crear y activar un entorno virtual:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 ```
 
-## Conceptos clave
+2. Instalar dependencias:
 
-### Page Object Model (POM)
-
-Las automatizaciones se basan en el patrón **Page Object Model**. Cada archivo en `pages/` encapsula las interacciones de una pantalla o módulo CMS. Esto permite reutilizar código y abstraer la lógica de UI:
-
-```python
-from playwright.sync_api import Page, expect
-
-class CM14TrazabilidadPage:
-    """Modela la pantalla CM14 – Trazabilidad de Tarjetas."""
-
-    def __init__(self, page: Page):
-        self.page = page
-
-    def open_from_menu(self, menu_page):
-        """Navega al módulo a través del menú principal."""
-        menu_page.open_cm14()
-
-    def buscar_tarjeta(self, numero: str):
-        # Implementación de búsqueda: rellenar campo, pulsar buscar, esperar tabla
-        pass
-
-    def validar_resultados(self, min_rows: int = 1):
-        # Validar que la tabla de resultados tenga al menos `min_rows` filas
-        pass
+```powershell
+python -m pip install -r requirements.txt
+# Instalar navegadores de Playwright (si no está instalado como dependencia directa):
+playwright install --with-deps
 ```
 
-### Fixtures globales
+3. Configurar credenciales y entorno: crear un archivo `.env` en la raíz con variables como `ADMIN_USER`, `ADMIN_PASS` y opcionalmente exportar `CMS_ENV=qa`.
 
-El archivo `conftest.py` define fixtures para inicializar el navegador, cargar configuración y gestionar el inicio de sesión. Estas fixtures están disponibles en todas las pruebas sin necesidad de importarlas explícitamente.
+Ejecución de pruebas (PowerShell)
 
-### Archivos de configuración
+- Ejecutar todas las pruebas E2E:
 
-Se proveen ejemplos de archivos YAML en `config/` para separar las URLs, credenciales y timeouts según el entorno (QA, producción, etc.). Para datos sensibles se utiliza un archivo `.env` (no incluido en el repositorio) que se carga mediante [`dotenv`](https://github.com/theskumar/python-dotenv).
-
-### Selección de suites
-
-Las pruebas se etiquetan con marcas `pytest` como `@pytest.mark.cm14`, `@pytest.mark.regression` o `@pytest.mark.sanity`. De esta forma puedes ejecutar subconjuntos de pruebas:
-
-```bash
-pytest -m "cm14 and regression"
+```powershell
+pytest -m "not ws01 and not ws02"
 ```
 
-### Módulos cubiertos
+- Ejecutar pruebas marcadas (ej. CM14):
 
-En esta versión se han incluido automatizaciones base para los siguientes módulos de consultas y reportes descritos en la guía operativa【547172095933312†L194-L241】:
+```powershell
+pytest -m cm14
+```
 
-| Módulo | Descripción (según guía) | Archivo de prueba |
-|-------|---------------------------|-------------------|
-| **CM14** | Trazabilidad de Tarjetas | `tests/e2e/test_cm14_trazabilidad.py` |
-| **CM44** | Reimpresión de Solicitudes | `tests/e2e/test_cm44_reimpresion.py` |
-| **CM45** | Consulta de Tarjetas | `tests/e2e/test_cm45_consulta.py` |
-| **CM18** | Tarjetas Por Opción | `tests/e2e/test_cm18_opcion.py` |
-| **CM87** | Historia de Tarjetas por Oficina | Prueba esqueleto en `test_placeholders.py` |
-| **CM19** | Historial de Tarjetas | `tests/e2e/test_cm19_historial.py` |
-| **CMA4** | Tarjetas Emitidas por Producto | Prueba esqueleto |
-| **CM85** | Reporte de Tarjetas Emitidas | `tests/e2e/test_cm85_emitidas.py` |
-| **CM16** | Tarjeta por Cuenta | `tests/e2e/test_cm16_cuenta.py` |
-| **CM21** | Consulta de Clave | `tests/e2e/test_cm21_clave.py` |
-| **CM88** | Reporte de tarjetas Anuladas, Suspendidas, Bloqueadas | Prueba esqueleto |
-| **CM60** | Tarjetas Canceladas | `tests/e2e/test_cm60_canceladas.py` |
-| **CM17** | Reporte de Costos | Prueba esqueleto |
-| **CM22** | Reporte de Tarjetas por Procesos | `tests/e2e/test_cm22_procesos.py` |
-| **CM89** | Reporte de Tarjetas por Vencer | Prueba esqueleto |
-| **CM97** | Reporte de Tarjetas por BIN | Prueba esqueleto |
-| **CM46** | Reporte de Lotes Pendientes | `tests/e2e/test_cm46_lotes_pendientes.py` |
-| **MD16** | Reporte de autorización de transacciones | Prueba esqueleto |
+- Ejecutar en paralelo (pytest-xdist):
 
-Para los módulos sin prueba implementada se provee una clase placeholder en `pages/placeholders.py` y un test esqueleto en `tests/e2e/test_placeholders.py` con instrucciones de cómo completarlo.
+```powershell
+pytest -n auto -m "cm14 or cm45"
+```
 
-## Próximos pasos y mejoras
+Reportes Allure (si está configurado)
 
-* **Completar los Page Objects**: Para cada módulo placeholder se deben implementar métodos concretos según los campos y acciones de la interfaz.
-* **Agregar validaciones específicas**: Las pruebas esqueleto solo contienen la estructura básica; es necesario añadir verificaciones de resultados, exportación de archivos y aserciones según los requisitos de cada reporte.
-* **Configurar CI/CD**: Integrar este proyecto en un pipeline (GitLab CI, Jenkins, GitHub Actions, etc.) para ejecutar las pruebas automáticamente en cada commit o de manera programada.
-* **Datos de prueba**: Crear fixtures con datos sintéticos para cubrir distintos escenarios (tarjetas existentes, inexistentes, fechas fuera de rango, etc.).
+```powershell
+pytest --alluredir=reports/allure
+# Luego, en Windows puedes servir el reporte si tienes Allure instalado:
+allure serve reports/allure
+```
 
-Para más detalles sobre la ejecución y configuración consulta el archivo [`docs/usage.md`](docs/usage.md).
+Buenas prácticas y notas
+
+- Prioriza `data-testid` para selectores cuando sea posible.
+- Mantén Page Objects pequeños y con responsabilidades claras.
+- Usa fixtures para datos de prueba y limpieza de entorno.
+
+Documentación adicional
+- `docs/usage.md` — guía de instalación y ejecución.
+- `docs/project_doc.md` — detalles sobre módulos y diseño.
+
+Si quieres, puedo también:
+- añadir un ejemplo de test minimal ejecutable (fixture + una prueba que abre la página de login).
+- preparar un pipeline básico de GitHub Actions para ejecutar las pruebas.
