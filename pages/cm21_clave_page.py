@@ -7,6 +7,9 @@ permisos adecuados.
 """
 
 from playwright.sync_api import Page, expect
+from datetime import date, timedelta
+import csv
+from pathlib import Path
 
 
 class CM21ClavePage:
@@ -90,3 +93,31 @@ class CM21ClavePage:
             pass
         report.close()
         self.page.bring_to_front()
+
+    def load_cards_from_csv(self, csv_path: str | None = None) -> list:
+        if csv_path is None:
+            default = Path(__file__).resolve().parent.parent / "tests" / "data" / "cards.csv"
+            csv_path = str(default)
+        csv_file = Path(csv_path)
+        if not csv_file.exists():
+            raise FileNotFoundError(f"CSV de tarjetas no encontrado: {csv_file}")
+        cards = []
+        with open(csv_file, newline='') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if 'card_number' in row and row['card_number'].strip():
+                    cards.append(row['card_number'].strip())
+        return cards
+
+    def run_for_card(self, card_number: str, days: int = 15) -> None:
+        fecha_fin = date.today()
+        fecha_inicio = fecha_fin - timedelta(days=days)
+        fmt = lambda d: d.strftime("%Y/%m/%d")
+        self.set_fechas(fmt(fecha_inicio), fmt(fecha_fin))
+        self.consultar_clave(card_number)
+        self.imprimir_y_capturar_report(screenshot_report_path=f"screenshot_cm21_report_{card_number}.png")
+
+    def run_all_from_csv(self, csv_path: str | None = None, days: int = 15) -> None:
+        cards = self.load_cards_from_csv(csv_path)
+        for c in cards:
+            self.run_for_card(c, days=days)

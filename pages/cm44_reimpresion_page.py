@@ -83,3 +83,31 @@ class CM44ReimpresionPage:
         self.page.bring_to_front()
 
     
+    def load_cards_from_csv(self, csv_path: str | None = None) -> list:
+        import csv
+        from pathlib import Path
+        if csv_path is None:
+            default = Path(__file__).resolve().parent.parent / "tests" / "data" / "cards.csv"
+            csv_path = str(default)
+        csv_file = Path(csv_path)
+        if not csv_file.exists():
+            raise FileNotFoundError(f"CSV de tarjetas no encontrado: {csv_file}")
+        cards = []
+        with open(csv_file, newline='') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if 'card_number' in row and row['card_number'].strip():
+                    cards.append(row['card_number'].strip())
+        return cards
+
+    def run_for_card(self, card_number: str) -> None:
+        self.buscar_por_tarjeta(card_number)
+        self.descargar_reporte()
+
+    def run_all_from_csv(self, csv_path: str | None = None) -> None:
+        cards = self.load_cards_from_csv(csv_path)
+        if not cards:
+            raise RuntimeError("No se encontraron tarjetas en el CSV")
+        for c in cards:
+            self.run_for_card(c)
+

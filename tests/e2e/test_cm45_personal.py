@@ -30,14 +30,5 @@ def test_consulta_cm45_pestana_personal(page, login):
     menu = login()
     cm45 = CM45ConsultaPage(page)
     cm45.open_from_menu(menu)
-
-    cm45.buscar_por_tarjeta(CARD)
-    cm45.continuar()
-    # Llegó a la pantalla; validar que el botón 'Salir' esté presente como evidencia de éxito
-    cm45.esperar_boton_salir(timeout=15_000)
-    # Guardar evidencia en la carpeta artefacts con el nombre solicitado
-    from pathlib import Path
-    artefacts = Path(__file__).parents[2] / "artefacts"
-    artefacts.mkdir(parents=True, exist_ok=True)
-    target = artefacts / "screenshot_cm45.png"
-    page.screenshot(path=str(target), full_page=True)
+    # delegar la ejecución al page-object (usa CSV por defecto o la tarjeta en el CSV)
+    cm45.run_all_from_csv()

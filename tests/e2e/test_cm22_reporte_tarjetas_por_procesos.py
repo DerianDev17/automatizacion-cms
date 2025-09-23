@@ -14,15 +14,5 @@ def test_cm22_reporte_tarjetas_por_procesos(page, login):
     menu = login()
     cm22 = CM22ProcesosPage(page)
     cm22.open_from_menu(menu)
-    cm22.seleccionar_proceso()
-    # establecer fechas específicas dentro del frame
-    if cm22.frame is not None:
-        hoy = date.today()
-        inicio = hoy - timedelta(days=15)
-        fmt = lambda d: d.strftime("%Y/%m/%d")
-        cm22.frame.fill("#ctl00_maincontent_FecInicial", fmt(inicio))
-        cm22.frame.fill("#ctl00_maincontent_FecFinal", fmt(hoy))
-
-    cm22.seleccionar_detallado()
-    cm22.imprimir_y_capturar_report()
+    cm22.run_and_capture()
     cm22.validar_resultados()

@@ -70,3 +70,34 @@ class CM45ConsultaPage:
 
     def validar_resultados(self, min_rows: int = 1) -> None:
         expect(self.page.locator("table tr")).to_have_count(at_least=min_rows)
+
+    def run_for_card_and_capture(self, card_number: str, artefacts_dir: str | None = None) -> None:
+        """Busca tarjeta en el iframe, continúa, espera boton Salir y captura screenshot en artefacts."""
+        frame = self._get_frame()
+        self.buscar_por_tarjeta(card_number)
+        self.continuar()
+        self.esperar_boton_salir(timeout=15_000)
+        # crear directorio artefacts si se pidió
+        from pathlib import Path
+        if artefacts_dir is None:
+            artefacts_dir = Path(__file__).resolve().parent.parent / "artefacts"
+        artefacts_dir = Path(artefacts_dir)
+        artefacts_dir.mkdir(parents=True, exist_ok=True)
+        target = artefacts_dir / f"screenshot_cm45_{card_number}.png"
+        self.page.screenshot(path=str(target), full_page=True)
+
+    def run_all_from_csv(self, csv_path: str | None = None) -> None:
+        import csv
+        from pathlib import Path
+        if csv_path is None:
+            default = Path(__file__).resolve().parent.parent / "tests" / "data" / "cards.csv"
+            csv_path = str(default)
+        csv_file = Path(csv_path)
+        if not csv_file.exists():
+            raise FileNotFoundError(f"CSV de tarjetas no encontrado: {csv_file}")
+        with open(csv_file, newline='') as fh:
+            reader = csv.DictReader(fh)
+            for row in reader:
+                card = row.get('card_number')
+                if card:
+                    self.run_for_card_and_capture(card.strip())

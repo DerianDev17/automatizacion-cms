@@ -5,6 +5,8 @@ procesamiento【547172095933312†L235-L239】.
 """
 
 from playwright.sync_api import Page, expect
+import csv
+from pathlib import Path
 
 
 class CM46LotesPendientesPage:
@@ -84,48 +86,30 @@ class CM46LotesPendientesPage:
                 self.page.screenshot(path=screenshot_result, full_page=True)
                 raise
 
-        # Intentar capturar popup que genera el PDF
-        try:
-            with self.page.expect_popup(timeout=15_000) as popup_info:
-                imprimir.click()
-            report = popup_info.value
-            report.wait_for_load_state("load")
-            report.wait_for_timeout(1_000)
-            try:
-                report.screenshot(path=screenshot_report, full_page=True)
-            except Exception:
-                pass
-            report.close()
+    def load_cards_from_csv(self, csv_path: str | None = None) -> list:
+        if csv_path is None:
+            default = Path(__file__).resolve().parent.parent / "tests" / "data" / "cards.csv"
+            csv_path = str(default)
+        csv_file = Path(csv_path)
+        if not csv_file.exists():
+            return []
+        cards = []
+        with open(csv_file, newline='') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if 'card_number' in row and row['card_number'].strip():
+                    cards.append(row['card_number'].strip())
+        return cards
 
-            # Volver al modal original y esperar confirmación
-            self.page.bring_to_front()
-            try:
-                # A veces es necesario re-click en Imprimir para que aparezca el texto
-                frame.click("#ctl00_maincontent_BtnImprimir")
-            except Exception:
-                pass
-            try:
-                frame.wait_for_selector("text=Reporte Concluido", timeout=30_000)
-            except Exception:
-                pass
+    def run_for_card(self, card_number: str) -> None:
+        # Algunos flujos de CM46 no requieren tarjeta, pero permitimos pasar una si se desea
+        self.generar_y_capturar()
+        self.descargar_excel()
 
-            # captura final
-            self.page.wait_for_timeout(1_000)
-            try:
-                self.page.screenshot(path=screenshot_result, full_page=True)
-            except Exception:
-                pass
-
-        except Exception:
-            # Si no se abrió popup, comprobar mensaje de 'no existen' y guardar evidencia
-            try:
-                frame.wait_for_selector("text=No existen tarjetas Pendientes.", timeout=2_000)
-                self.page.screenshot(path=screenshot_result, full_page=True)
-                return
-            except Exception:
-                # tomar captura y volver a lanzar
-                self.page.screenshot(path=screenshot_result, full_page=True)
-                raise
+    def run_all_from_csv(self, csv_path: str | None = None) -> None:
+        # Ejecuta el flujo principal (sin tarjeta) y luego intenta descargar
+        self.generar_y_capturar()
+        self.descargar_excel()
 
     def descargar_excel(self) -> None:
         """Descarga el reporte en formato Excel."""

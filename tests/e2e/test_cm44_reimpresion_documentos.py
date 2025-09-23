@@ -15,6 +15,5 @@ def test_cm44_reimpresion_documentos(page, login):
     menu = login()
     cm44 = CM44ReimpresionPage(page)
     cm44.open_from_menu(menu)
-    # buscar por tarjeta y descargar reporte; el número puede venir de datos/fixture
-    cm44.buscar_por_tarjeta(CARD_NUMBER)
-    cm44.descargar_reporte()
+    # delegar ejecución al page-object (usa CSV por defecto)
+    cm44.run_all_from_csv()

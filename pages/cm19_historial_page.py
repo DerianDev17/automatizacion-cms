@@ -5,6 +5,9 @@ largo del tiempo【547172095933312†L204-L208】.
 """
 
 from playwright.sync_api import Page, expect
+from datetime import date, timedelta
+import csv
+from pathlib import Path
 
 
 class CM19HistorialPage:
@@ -99,3 +102,52 @@ class CM19HistorialPage:
         frame.wait_for_timeout(500)
         count = rows.count()
         assert count >= min_rows, f"Se esperaban al menos {min_rows} filas, pero se encontraron {count}"
+
+    # --- Encapsulación de flujo de prueba completa ---
+    def load_cards_from_csv(self, csv_path: str | None = None) -> list:
+        if csv_path is None:
+            default = Path(__file__).resolve().parent.parent / "tests" / "data" / "cards.csv"
+            csv_path = str(default)
+        csv_file = Path(csv_path)
+        if not csv_file.exists():
+            raise FileNotFoundError(f"CSV de tarjetas no encontrado: {csv_file}")
+
+        cards = []
+        with open(csv_file, newline='') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if 'card_number' in row and row['card_number'].strip():
+                    cards.append(row['card_number'].strip())
+        return cards
+
+    def run_for_card(self, numero_tarjeta: str, days: int = 15) -> None:
+        """Ejecuta el flujo completo para una tarjeta: buscar, fijar fechas, imprimir y validar."""
+        # calcular fechas
+        fecha_fin = date.today()
+        fecha_inicio = fecha_fin - timedelta(days=days)
+        fmt = lambda d: d.strftime("%Y/%m/%d")
+        fecha_fin_str = fmt(fecha_fin)
+        fecha_inicio_str = fmt(fecha_inicio)
+
+        # ejecutar pasos
+        self.buscar_por_numero(numero_tarjeta)
+        self.set_fechas(fecha_inicio_str, fecha_fin_str)
+        self.imprimir_y_capturar_report(screenshot_report_path=f"screenshot_cm19_report_{numero_tarjeta}.png",
+                                        screenshot_result_path=f"screenshot_cm19_main_{numero_tarjeta}.png")
+        # validar que existan resultados en el frame
+        try:
+            self.validar_resultados(min_rows=1)
+        except AssertionError:
+            # dejar evidencia aunque falle
+            try:
+                self.page.screenshot(path=f"screenshot_cm19_error_{numero_tarjeta}.png", full_page=True)
+            except Exception:
+                pass
+            raise
+
+    def run_all_from_csv(self, csv_path: str | None = None, days: int = 15) -> None:
+        cards = self.load_cards_from_csv(csv_path)
+        if not cards:
+            raise RuntimeError("No se encontraron tarjetas en el CSV")
+        for c in cards:
+            self.run_for_card(c, days=days)

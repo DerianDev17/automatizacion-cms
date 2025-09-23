@@ -5,6 +5,7 @@ renovación, reposición, etc.)【547172095933312†L221-L224】.
 """
 
 from playwright.sync_api import Page, expect
+from datetime import date, timedelta
 
 
 class CM22ProcesosPage:
@@ -124,3 +125,19 @@ class CM22ProcesosPage:
         self.frame.wait_for_timeout(500)
         count = rows.count()
         assert count >= min_rows, f"Se esperaban al menos {min_rows} filas, pero se encontraron {count}"
+
+    def set_date_range_days(self, days: int = 15) -> None:
+        if self.frame is None:
+            raise RuntimeError("El frame de CM22 no está inicializado. Llame a open_from_menu primero.")
+        hoy = date.today()
+        inicio = hoy - timedelta(days=days)
+        fmt = lambda d: d.strftime("%Y/%m/%d")
+        self.frame.fill("#ctl00_maincontent_FecInicial", fmt(inicio))
+        self.frame.fill("#ctl00_maincontent_FecFinal", fmt(hoy))
+
+    def run_and_capture(self, proceso: str | None = None, days: int = 15) -> None:
+        """Conveniencia: seleccionar proceso (opcional), fijar fechas, marcar detallado e imprimir/capturar."""
+        self.seleccionar_proceso(proceso)
+        self.set_date_range_days(days)
+        self.seleccionar_detallado()
+        self.imprimir_y_capturar_report()
