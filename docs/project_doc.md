@@ -1,173 +1,126 @@
-# Documentación del proyecto cms_automation
+# Documentación del proyecto `cms_automation`
 
-Este documento resume el estado del proyecto y las guías rápidas para
-extender y mantener las automatizaciones centradas en Consultas y
-Reportes del CMS.
+Este documento ofrece una visión detallada de la arquitectura, los módulos cubiertos y las convenciones de desarrollo del repositorio de automatización del Card Management System (CMS).
 
-Estado de módulos (resumen)
+## 1. Resumen general
 
-Implementados
+- **Tecnologías principales**: Python 3.11+, pytest, Playwright, pytest-html, pytest-xdist.
+- **Patrón**: Page Object Model (POM) para encapsular la lógica de cada módulo del CMS y facilitar la reutilización de código.
+- **Alcance actual**: automatización de los módulos de la sección de Consultas y Reportes del CMS y esqueletos para los servicios web WS01 y WS02.
+- **Objetivo**: centralizar la automatización en un único repositorio, simplificar la ejecución de pruebas y proporcionar documentación operativa clara.
 
-- CM14 — Trazabilidad (`pages/cm14_trazabilidad_page.py`, `tests/e2e/test_cm14_trazabilidad.py`)
-- CM16 — Tarjeta por Cuenta
-- CM18 — Tarjetas por Opción
+## 2. Arquitectura de la solución
 
-Pendientes / Placeholders
+### 2.1 Capas principales
 
-- CM17, CM87, CM88, CM89, CM97, CMA4, MD16 — hay clases placeholder en `pages/placeholders.py` y tests esqueleto en `tests/e2e/test_placeholders.py`.
+| Capa | Elementos clave | Descripción |
+|------|-----------------|-------------|
+| Configuración | `config/<entorno>.yaml`, variables de entorno, `.env` | Define URLs, timeouts y usuarios por entorno. `CMS_ENV` selecciona el archivo YAML. |
+| Fixtures | `conftest.py` | Gestiona la carga de configuración, credenciales, inicialización de Playwright, videos y evidencia. |
+| Page Objects | `pages/*.py` | Modelan pantallas del CMS y encapsulan acciones de negocio (búsquedas, exportes, validaciones). |
+| Tests | `tests/e2e`, `tests/api` | Casos end-to-end por módulo y esqueletos para servicios web. |
+| Utilidades | `utils/` | Selectores, waits personalizados, helpers de archivos y marcadores para autenticación avanzada. |
+| Documentación | `README.md`, `docs/` | Manual de uso y guías de arquitectura para mantener la información del proyecto. |
 
-Diseño y buenas prácticas
+### 2.2 Flujo típico de una prueba E2E
 
-- Page Object Model (POM): cada archivo en `pages/` debe exponer acciones de alto nivel (abrir, buscar, exportar, validar).
-- Fixtures: `conftest.py` expone `config`, `browser/context/page` y `login`.
-- Selectores: centralizar selectores reutilizables en `utils/selectors.py`.
+1. `pytest` inicia y carga las fixtures definidas en `conftest.py`.
+2. `config()` lee `config/<entorno>.yaml` y devuelve un diccionario con parámetros de entorno.
+3. `creds()` combina las credenciales del YAML con las variables de entorno (prioridad para estas últimas) y expone un mapa por rol.
+4. `browser_type_launch_args` y `browser_context_args` ajustan Playwright para ignorar errores HTTPS, grabar vídeo y almacenar evidencias.
+5. La fixture `page` abre una nueva pestaña, la proporciona al test y captura automáticamente un screenshot al finalizar.
+6. La fixture `login` utiliza `LoginPage` y `MenuPage` para autenticarse y devolver un objeto de menú listo para navegar.
+7. El test usa el Page Object correspondiente para ejecutar acciones concretas del módulo y validar resultados.
+8. Tras cada prueba, `pytest_runtest_makereport` mueve capturas/vídeos recientes al directorio `artefacts/` y los adjunta en el reporte HTML.
 
-Contrato mínimo de un Page Object
+## 3. Cobertura de módulos
 
-- Inputs: `page` (Playwright) y parámetros de negocio (número de tarjeta, rango de fechas).
-- Outputs: resultados visibles (tabla) y/o archivos generados.
-- Errores: lanzar excepción clara cuando la página no carga o faltan elementos.
+La siguiente tabla resume el estado de automatización de los módulos de Consultas y Reportes, indicando la clase principal y el archivo de prueba asociado.
 
-Cómo extender el proyecto (pasos rápidos)
+| Módulo | Descripción | Estado | Page Object | Prueba |
+|--------|-------------|--------|-------------|--------|
+| CM14 | Trazabilidad de Tarjetas | Implementado | `CM14TrazabilidadPage` (`pages/cm14_trazabilidad_page.py`) | `tests/e2e/test_cm14_trazabilidad_tarjetas.py` |
+| CM16 | Tarjeta por Cuenta | Implementado | `CM16CuentaPage` (`pages/cm16_cuenta_page.py`) | `tests/e2e/test_cm16_tarjetas_por_cuentas.py` |
+| CM18 | Tarjetas por Opción | Implementado | `CM18OpcionPage` (`pages/cm18_opcion_page.py`) | `tests/e2e/test_cm18_reporte_tarjetas_por_opcion.py` |
+| CM19 | Historial de Tarjetas | Implementado | `CM19HistorialPage` (`pages/cm19_historial_page.py`) | `tests/e2e/test_cm19_historial_tarjetas_debito.py` |
+| CM21 | Consulta de Clave | Implementado | `CM21ClavePage` (`pages/cm21_clave_page.py`) | `tests/e2e/test_cm21_reporte_consultas_clave.py` |
+| CM22 | Reporte de Tarjetas por Procesos | Implementado | `CM22ProcesosPage` (`pages/cm22_procesos_page.py`) | `tests/e2e/test_cm22_reporte_tarjetas_por_procesos.py` |
+| CM44 | Reimpresión de Solicitudes | Implementado | `CM44ReimpresionPage` (`pages/cm44_reimpresion_page.py`) | `tests/e2e/test_cm44_reimpresion_documentos.py` |
+| CM45 | Consulta de Tarjetas | Implementado | `CM45ConsultaPage` (`pages/cm45_consulta_page.py`) | `tests/e2e/test_cm45_personal.py` |
+| CM46 | Reporte de Lotes Pendientes | Implementado | `CM46LotesPendientesPage` (`pages/cm46_lotes_pendientes_page.py`) | `tests/e2e/test_cm46_reporte_lotes_pendientes.py` |
+| CM60 | Tarjetas Canceladas | Implementado | `CM60CanceladasPage` (`pages/cm60_canceladas_page.py`) | `tests/e2e/test_cm60_reporte_tarjetas_canceladas.py` |
+| CM85 | Reporte de Tarjetas Emitidas | Implementado | `CM85EmitidasPage` (`pages/cm85_emitidas_page.py`) | `tests/e2e/test_cm85_reporte_tarjetas_emitidas.py` |
+| Placeholders | CM17, CM87, CMA4, CM88, CM89, CM97, MD16 | Pendiente | Clases en `pages/placeholders.py` | `tests/e2e/test_placeholders.py` |
+| WS01 / WS02 | Servicios web del switch | Pendiente | No aplica | `tests/api/test_ws01_movimientos_switch.py`, `tests/api/test_ws02_consulta_transacciones.py`, `tests/api/test_ws02_consulta_transacciones_switch.py` |
 
-1. Crear o completar un Page Object en `pages/`. Mantén métodos pequeños y descriptivos.
-2. Añadir un test en `tests/e2e/` que use la fixture `login` para autenticarse y navegar.
-3. Marcar el test con `@pytest.mark.cmXX` y validar localmente.
-4. Agregar selectores compartidos a `utils/selectors.py` si aplican.
+> Los módulos marcados como *pendiente* disponen de clases placeholder que abren el módulo desde el menú y lanzan `NotImplementedError` para recordar que falta la automatización.
 
-Notas
+## 4. Componentes clave
 
-- Prioriza el uso de `data-testid` en la aplicación para selectores estables.
-- Mantén la documentación actualizada al completar módulos.
-- Para cambios mayores (por ejemplo, reorganizar `pages/`), actualiza este archivo y `README.md`.
-# Documentación del proyecto de automatización CMS
+### 4.1 Page Objects y navegación
 
-## Introducción
+- `LoginPage`: encapsula la navegación a la pantalla de login y la autenticación.
+- `MenuPage`: provee métodos `open_cmXX` para abrir cada módulo desde el buscador del menú principal. Internamente usa `_open_menu_item` y espera el `iframe` correspondiente.
+- Cada Page Object implementa métodos de interacción específicos (por ejemplo, `CM14TrazabilidadPage.run_all_from_csv` procesa tarjetas desde un CSV y captura reportes).
+- Los placeholders (`pages/placeholders.py`) comparten la lógica base `BasePlaceholderPage` que abre el módulo y lanza `NotImplementedError`.
 
-El proyecto **cms_automation** surgió con el objetivo de consolidar y
-reutilizar las automatizaciones de los distintos módulos del *Card Management
-System* (CMS) de la Red Transaccional Cooperativa. El manual operativo
-describe numerosos módulos con funciones de parametrización, ciclo de
-tarjeta, mantenimiento, tarjetas innominadas y reportes【547172095933312†L194-L241】.
-En particular, esta automatización se centra en los módulos de **Consultas
-y Reportes** (sección 9 del manual).
+### 4.2 Fixtures y hooks relevantes
 
-## Lista de módulos de consultas y reportes
+- `config` (scope `session`): carga YAML según `CMS_ENV`.
+- `creds` (scope `session`): combina credenciales del YAML con variables de entorno, utilizando `python-dotenv`.
+- `browser_type_launch_args`: añade `--ignore-certificate-errors` a Chromium/Chrome.
+- `browser_context_args`: habilita `ignore_https_errors`, crea el directorio `videos/` y graba cada prueba.
+- `page`: abre una nueva pestaña, la entrega al test y toma un screenshot automático.
+- `login`: retorna una función que realiza el login y entrega un `MenuPage` listo para navegar.
+- `pytest_runtest_makereport`: mueve capturas/vídeos recientes a `artefacts/` y los adjunta en el reporte HTML utilizando `pytest-html`.
 
-La siguiente tabla resume los módulos listados en la sección 9 del manual
-operativo【547172095933312†L194-L241】, indica si ya existe una automatización
-en este proyecto y enlaza la clase correspondiente en `pages/`:
+### 4.3 Utilidades (`utils/`)
 
-| Módulo | Descripción breve | Estado de automatización | Clase / Prueba |
-|-------|--------------------|---------------------------|---------------|
-| **CM14** | Trazabilidad de Tarjetas | Implementado | `CM14TrazabilidadPage` / `test_cm14_trazabilidad.py` |
-| **CM44** | Reimpresión de Solicitudes | Implementado | `CM44ReimpresionPage` / `test_cm44_reimpresion.py` |
-| **CM45** | Consulta de Tarjetas | Implementado | `CM45ConsultaPage` / `test_cm45_consulta.py` |
-| **CM18** | Tarjetas por Opción | Implementado | `CM18OpcionPage` / `test_cm18_opcion.py` |
-| **CM87** | Historia de Tarjetas por Oficina | Pendiente | Clase placeholder `CM87HistoriaOficinaPage` |
-| **CM19** | Historial de Tarjetas | Implementado | `CM19HistorialPage` / `test_cm19_historial.py` |
-| **CMA4** | Tarjetas Emitidas por Producto | Pendiente | Clase placeholder `CMA4EmitidasProductoPage` |
-| **CM85** | Reporte de Tarjetas Emitidas | Implementado | `CM85EmitidasPage` / `test_cm85_emitidas.py` |
-| **CM16** | Tarjeta por Cuenta | Implementado | `CM16CuentaPage` / `test_cm16_cuenta.py` |
-| **CM21** | Consulta de Clave | Implementado | `CM21ClavePage` / `test_cm21_clave.py` |
-| **CM88** | Reporte de tarjetas Anuladas, Suspendidas, Bloqueadas | Pendiente | Clase placeholder `CM88AnuladasSuspendidasPage` |
-| **CM60** | Tarjetas Canceladas | Implementado | `CM60CanceladasPage` / `test_cm60_canceladas.py` |
-| **CM17** | Reporte de Costos | Pendiente | Clase placeholder `CM17CostosPage` |
-| **CM22** | Reporte de Tarjetas por Procesos | Implementado | `CM22ProcesosPage` / `test_cm22_procesos.py` |
-| **CM89** | Reporte de Tarjetas por Vencer | Pendiente | Clase placeholder `CM89VencerPage` |
-| **CM97** | Reporte de Tarjetas por BIN | Pendiente | Clase placeholder `CM97BinPage` |
-| **CM46** | Reporte de Lotes Pendientes | Implementado | `CM46LotesPendientesPage` / `test_cm46_lotes_pendientes.py` |
-| **MD16** | Reporte de autorización de transacciones | Pendiente | Clase placeholder `MD16AutorizacionesPage` |
+- `selectors.py`: centraliza selectores CSS/XPath. Contiene ejemplos listos para ser sustituidos por `data-testid` en cuanto estén disponibles.
+- `waits.py`: helpers para esperar spinners (`wait_for_spinner`) o descargas (`wait_for_download`).
+- `files.py`: función `save_download` para almacenar archivos descargados con Playwright.
+- `auth.py`: marcador para futuras extensiones de autenticación (renovación de sesión vía API).
 
-Los módulos marcados como *pendiente* están representados por clases
-placeholder que heredan de `BasePlaceholderPage`. Estos placeholders
-permiten navegar al módulo correspondiente pero lanzan un
-`NotImplementedError` en su método `not_implemented()`, recordando que
-falta la automatización.
+### 4.4 Estructura de datos y evidencias
 
-## Diseño y reutilización de código
+- `tests/data/`: carpeta sugerida para almacenar CSV u otros archivos de datos. No existe por defecto; créala según tus necesidades.
+- `artefacts/`: destino final de capturas y vídeos relevantes por prueba.
+- `videos/`: carpeta temporal donde Playwright guarda los vídeos antes de ser movidos a `artefacts/`.
+- `reports/`: salida de `pytest-html` (por defecto `report.html`). También puede albergar reportes Allure (`reports/allure`).
 
-### Patrón Page Object
+## 5. Extensión y mantenimiento
 
-Cada pantalla del CMS se modela como una clase en la carpeta `pages/`. Los
-métodos de estas clases encapsulan acciones de alto nivel (abrir la página,
-realizar búsquedas, seleccionar opciones, generar reportes, etc.), de forma
-que las pruebas (`tests/e2e/`) solo llaman a estos métodos y realizan
-aserciones. Este patrón tiene varias ventajas:
+### 5.1 Añadir un nuevo módulo del CMS
 
-* **Reutilización**: Los mismos métodos se pueden utilizar en distintas
-  pruebas o flujos, evitando duplicación.
-* **Mantenibilidad**: Si cambia la interfaz (nombres de campos o botones),
-  únicamente se actualiza la clase Page Object.
-* **Legibilidad**: Los tests se leen como pasos de negocio en lugar de
-  secuencias de clicks y waits.
+1. Crea el Page Object en `pages/` siguiendo el patrón de los módulos existentes.
+2. Implementa la navegación desde `MenuPage` si aún no existe un método `open_cmXX` para el nuevo módulo.
+3. Añade la prueba correspondiente en `tests/e2e/`, utilizando la fixture `login` y el nuevo Page Object.
+4. Define un marcador en `pytest.ini` (`cmXX`) para facilitar la ejecución selectiva.
+5. Documenta el nuevo módulo en este archivo y en el README.
 
-### Fixtures compartidas
+### 5.2 Implementar un placeholder pendiente
 
-El archivo `conftest.py` define fixtures de alto nivel:
+1. Actualiza la clase en `pages/placeholders.py` reemplazando la herencia de `BasePlaceholderPage` por un Page Object real.
+2. Completa la prueba específica en `tests/e2e/` y elimina la entrada correspondiente del `parametrize` en `test_placeholders.py`.
+3. Asegúrate de retirar la expectativa `NotImplementedError` y de añadir asserts reales.
 
-* `config`: lee parámetros desde `config/<entorno>.yaml` dependiendo de la
-  variable `CMS_ENV`.
-* `creds`: combina las credenciales definidas en YAML con las variables de
-  entorno cargadas a partir de `.env`.
-* `browser`/`context`/`page`: inicializan Playwright de forma aislada para
-  cada prueba.
-* `login`: realiza el proceso de autenticación y devuelve un `MenuPage`.
+### 5.3 Pruebas de servicios web
 
-Estas fixtures evitan repetir la misma lógica en cada test y facilitan el
-cambio de configuración (por ejemplo, poder ejecutar las pruebas tanto en
-QA como en producción sin modificar el código).
+- Reutiliza `pytest` puro para WS01/WS02. Cuando los endpoints estén disponibles, utiliza `requests` o `playwright.sync_api.APIRequestContext`.
+- Define fixtures para tokens, cabeceras o payloads reutilizables.
+- Considera validar contratos con bibliotecas como `pydantic` o `jsonschema`.
 
-### Selectores centralizados
+### 5.4 Buenas prácticas de mantenimiento
 
-El módulo `utils/selectors.py` es el lugar para definir selectores CSS,
-XPath o `data-testid`. Actualmente contiene ejemplos, pero se recomienda
-convenir con el equipo de desarrollo del CMS la inclusión de atributos
-`data-testid` en los elementos clave de la interfaz. De esta forma, los
-selectores serán más robustos y no dependerán de textos visibles que
-pueden cambiar.
+- Mantén los selectores en un único lugar (`selectors.py`) y anota en comentarios cuándo fue la última validación en producción/QA.
+- Documenta cualquier workaround temporal directamente en el Page Object con TODOs claros.
+- Revisa y limpia periódicamente los directorios `artefacts/`, `videos/` y `downloads/` para evitar que crezcan sin control.
+- Ejecuta `pytest` en local antes de subir cambios y, si es posible, integra la suite en un pipeline de CI (GitHub Actions, Jenkins, etc.).
 
-### Utilidades genéricas
+## 6. Referencias cruzadas
 
-Además de selectores, el paquete `utils/` contiene funciones que pueden
-reutilizarse en distintos contextos:
+- [`README.md`](../README.md): resumen general y pasos rápidos de instalación.
+- [`docs/usage.md`](usage.md): instrucciones operativas detalladas para ejecutar la suite.
+- Código fuente de Page Objects y pruebas (`pages/`, `tests/`) para ejemplos concretos de implementación.
 
-* `waits.py`: funciones de espera personalizadas como `wait_for_spinner` o
-  `wait_for_download` para sincronizar la interacción con la UI.
-* `files.py`: gestiona la descarga y almacenamiento de archivos
-  generados por los reportes (Excel, PDF).
-* `auth.py`: incluye marcadores para futuras extensiones como refresco de
-  sesión vía API.
-
-### Esqueletos de API
-
-Las pruebas bajo `tests/api/` están pensadas para validar los servicios
-web (WS) que interactúan con el CMS. Actualmente las pruebas WS01 y
-WS02 están marcadas como pendientes (`pytest.skip`) porque los
-endpoints todavía no están disponibles. Cuando se publiquen, se podrán
-implementar utilizando bibliotecas como `requests` o la API de
-Playwright `api_request`.
-
-## Cómo extender el proyecto
-
-1. **Crear un nuevo Page Object** en `pages/` para el módulo que quieras
-   automatizar. Usa como plantilla una de las clases existentes y
-   define métodos descriptivos según las acciones de la pantalla.
-2. **Crear una prueba** en `tests/e2e/` importando la clase del paso 1.
-   Usa la fixture `login` para autenticación y el menú para navegar.
-   Añade marcas `pytest.mark.cmXX` para filtrar la ejecución.
-3. **Actualizar la documentación** en este archivo y en `README.md` para
-   reflejar el nuevo módulo.
-4. **Ajustar selectores y timeouts**: cuando la aplicación esté disponible,
-   reemplaza los selectores genéricos por `data-testid`. Ajusta los
-   timeouts en `waits.py` según la velocidad de respuesta de la
-   aplicación.
-
-## Créditos y referencias
-
-La estructura y cobertura de este proyecto se basan en la **Guía
-Operativa CMS** (julio de 2021), documento que describe las funciones de
-cada módulo【547172095933312†L194-L241】. La idea es ofrecer una base sobre la cual
-ampliar la automatización de forma sostenible, facilitando la adopción de
-buenas prácticas como el uso de Page Objects, configuración externa y
-documentación clara.
+Mantener esta documentación actualizada cada vez que se incorpora un nuevo módulo o se modifica un flujo es clave para conservar la trazabilidad del proyecto y facilitar la incorporación de nuevos miembros al equipo.
