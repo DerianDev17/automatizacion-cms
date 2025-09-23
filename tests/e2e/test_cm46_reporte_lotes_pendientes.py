@@ -13,5 +13,5 @@ def test_cm46_reporte_lotes_pendientes(page, login):
     menu = login()
     cm46 = CM46LotesPendientesPage(page)
     cm46.open_from_menu(menu)
-    cm46.generar_reporte()
+    cm46.generar_y_capturar()
     cm46.descargar_excel()

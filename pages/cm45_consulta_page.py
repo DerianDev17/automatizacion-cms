@@ -15,7 +15,15 @@ class CM45ConsultaPage:
 
     def open_from_menu(self, menu_page) -> None:
         menu_page.open_cm45()
-        expect(self.page.locator("text=CM45")).to_be_visible()
+        # Esperar al iframe del módulo en vez del texto
+        self.page.wait_for_selector("iframe[name='iframe_CM45']", timeout=30_000)
+
+    def _get_frame(self):
+        iframe_el = self.page.wait_for_selector("iframe[name='iframe_CM45']", timeout=30_000)
+        frame = iframe_el.content_frame()
+        if frame is None:
+            raise RuntimeError("No se pudo obtener el frame de CM45")
+        return frame
 
     def buscar(self, criterio: str, valor: str) -> None:
         """Realiza una búsqueda por un criterio específico.
@@ -29,6 +37,36 @@ class CM45ConsultaPage:
         self.page.fill(selector_campo, valor)
         self.page.click("button:has-text('Buscar')")
         expect(self.page.locator("table tr")).to_have_count(at_least=1)
+
+    def buscar_por_tarjeta(self, card_number: str) -> None:
+        frame = self._get_frame()
+        frame.fill("#ctl00_maincontent_TxtTarjeta", card_number)
+        frame.evaluate("__doPostBack('ctl00$maincontent$TxtTarjeta','');")
+        # esperar que se enmascare o que haya un pequeño delay
+        try:
+            frame.wait_for_selector("#ctl00_maincontent_TxtTarjeta[value*='XXXX']", timeout=15_000)
+        except Exception:
+            frame.wait_for_timeout(2_000)
+
+    def continuar(self) -> None:
+        frame = self._get_frame()
+        continuar = frame.locator("#ctl00_maincontent_UpdatePanel3 #ctl00_maincontent_BtnContinuar:not([disabled])")
+        continuar.wait_for(state="visible", timeout=20_000)
+        continuar.click()
+        frame.wait_for_timeout(2_000)
+
+    def obtener_identificacion(self) -> str:
+        frame = self._get_frame()
+        id_input = frame.wait_for_selector("//td[normalize-space()='Identificacion:']/following-sibling::td//input", timeout=10_000)
+        return id_input.input_value().strip()
+
+    def esperar_boton_salir(self, timeout: int = 10_000) -> None:
+        """Espera a que el botón 'Salir' (Cancelar) esté visible en la pantalla del iframe.
+
+        Selector usado: `#ctl00_maincontent_BtnCancelar` (referencia del usuario).
+        """
+        frame = self._get_frame()
+        frame.wait_for_selector("#ctl00_maincontent_BtnCancelar", timeout=timeout)
 
     def validar_resultados(self, min_rows: int = 1) -> None:
         expect(self.page.locator("table tr")).to_have_count(at_least=min_rows)

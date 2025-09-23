@@ -2,7 +2,7 @@
 
 Este proyecto provee una estructura base para automatizar los módulos del **Card Management System (CMS)** de la Red Transaccional Cooperativa. Se utilizan **Python**, **pytest** y **Playwright** para ejecutar pruebas end‑to‑end reutilizables.
 
-El objetivo es centralizar las automatizaciones en un único repositorio, reutilizar código entre los diferentes módulos y proporcionar una guía clara de uso. La guía operativa de CMS describe muchos módulos (CM01, CM03, CM06, CM14, CM16, CM18, CM19, CM21, CM22, CM44, CM45, CM46, CM60, CM85, etc.), cada uno de los cuales corresponde a una página o reporte dentro del sistema【547172095933312†L194-L241】. A partir de dicha guía se incluyen ejemplos de automatización de los módulos de consultas y reportes y se generan archivos de prueba esqueleto para los módulos no cubiertos.
+El objetivo es centralizar las automatizaciones en un único repositorio, reutilizar código entre los diferentes módulos y proporcionar una guía clara de uso. La guía operativa de CMS describe muchos módulos (CM01, CM03, CM06, CM14, CM16, CM18, CM19, CM21, CM22, CM44, CM45, CM46, CM60, CM85, etc.), cada uno de los cuales corresponde a una página o reporte dentro del sistema. A partir de dicha guía se incluyen ejemplos de automatización de los módulos de consultas y reportes y se generan archivos de prueba esqueleto para los módulos no cubiertos.
 
 ## Estructura de carpetas
 
@@ -86,7 +86,7 @@ python -m pip install -r requirements.txt
 playwright install --with-deps
 ```
 
-3. Configurar credenciales y entorno: crear un archivo `.env` en la raíz con variables como `ADMIN_USER`, `ADMIN_PASS` y opcionalmente exportar `CMS_ENV=qa`.
+3. (Opcional) Configurar credenciales y entorno: si prefieres usar variables locales crea un `.env` o configura tu entorno; por defecto el proyecto lee `config/qa.yaml`.
 
 Ejecución de pruebas (PowerShell)
 
@@ -106,6 +106,12 @@ pytest -m cm14
 
 ```powershell
 pytest -n auto -m "cm14 or cm45"
+```
+
+Ejecutar con reporte HTML (ejemplo):
+
+```powershell
+python -m pytest --headed --html=report.html --self-contained-html
 ```
 
 Reportes Allure (si está configurado)
