@@ -45,6 +45,7 @@ ENV/
 *.pdf
 *.xlsx
 *.csv
+*.yaml
 
 # Otros
 node_modules/
