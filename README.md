@@ -1,187 +1,225 @@
 # Automatización del Card Management System (CMS)
 
-Este repositorio recopila la automatización end-to-end de los módulos de **Consultas y Reportes** del *Card Management System* (CMS) utilizado por la Red Transaccional Cooperativa. Las pruebas se implementan con **Python**, **pytest** y **Playwright**, siguen el patrón **Page Object Model (POM)** y comparten fixtures reutilizables para iniciar sesión, navegar por el menú y manipular evidencias.
+Este repositorio contiene la automatización end-to-end de los módulos de **Consultas y Reportes** del *Card Management System* (CMS) de la Red Transaccional Cooperativa. Las pruebas están implementadas con **Python**, **pytest** y **Playwright** utilizando el patrón **Page Object Model (POM)** para facilitar el mantenimiento y la reutilización.
 
-La intención principal es ofrecer una base mantenible sobre la cual extender la cobertura funcional del CMS, reutilizar código entre módulos y documentar el flujo completo de ejecución.
+El objetivo es ofrecer una base probada, bien documentada y lista para extender la cobertura funcional del CMS sin fricción para nuevos integrantes del equipo.
 
 ## Características principales
 
-- Page Objects que encapsulan la lógica de cada módulo del CMS (login, menú, CM14, CM16, CM18, CM19, CM21, CM22, CM44, CM45, CM46, CM60, CM85 y placeholders para el resto).
-- Fixtures centralizadas en `conftest.py` para cargar configuración YAML, preparar credenciales, lanzar Playwright, manejar grabación de vídeo y recoger evidencias.
-- Configuración por entorno (`config/qa.yaml`) y soporte para sobrescribir credenciales mediante variables de entorno o archivos `.env`.
-- Estructura lista para generar reportes HTML (`pytest-html`), almacenar capturas/vídeos en `artefacts/` y consumir Allure si se desea.
-- Pruebas esqueleto para servicios web (WS01 y WS02) y módulos aún no automatizados, lo que facilita planificar la cobertura futura.
+- Page Objects especializados para cada módulo automatizado (CM14, CM16, CM18, CM19, CM21, CM22, CM44, CM45, CM46, CM60, CM85), además de la autenticación y navegación principal.
+- Fixtures centralizadas en `conftest.py` para cargar configuración YAML, preparar credenciales, lanzar Playwright con manejo de vídeo y mover evidencias a una ubicación controlada.
+- Configuración por entorno en `config/` con soporte para variables de entorno y archivos `.env`.
+- Integración nativa con `pytest-html`, posibilidad de ejecutar en paralelo (`pytest-xdist`) y hooks que generan artefactos listos para auditoría.
+- Documentación ampliada en `docs/` para profundizar en la arquitectura y el flujo operativo.
 
 ## Requisitos previos
 
 - Python 3.11 o superior.
-- `pip` actualizado.
-- Node.js únicamente si aún no cuentas con los navegadores de Playwright instalados (`playwright install --with-deps`).
-- Acceso a las URL del CMS (por ejemplo, entorno QA) y credenciales válidas.
+- `pip` actualizado a la última versión disponible.
+- Navegadores de Playwright instalados (se descargan con `playwright install`).
+- Acceso a la URL del CMS del entorno que se desea automatizar y credenciales válidas.
 
-> ℹ️ El paquete se importa en el código como `cms_automation`. Si clonas el repositorio con otro nombre, renombra la carpeta o ajusta tu `PYTHONPATH` para que Python pueda resolver ese módulo.
+> ℹ️ El paquete se importa como `cms_automation`. Se recomienda clonar el repositorio usando ese nombre para evitar configurar rutas adicionales.
 
-## Instalación rápida
+## Instalación rápida (paso a paso por terminal)
 
-1. **Clona el proyecto** (se recomienda utilizar el nombre `cms_automation` para evitar ajustes adicionales):
+Selecciona la terminal que uses habitualmente y sigue los comandos indicados. En todos los casos se asume que cuentas con Python 3.11+ en el `PATH`.
 
-   ```bash
-   git clone <url-del-repositorio> cms_automation
-   cd cms_automation
-   ```
+### PowerShell (Windows)
 
-   En PowerShell:
+```powershell
+# 1. Clonar el repositorio
+git clone <url-del-repositorio> cms_automation
+Set-Location cms_automation
 
-   ```powershell
-   git clone <url-del-repositorio> cms_automation
-   Set-Location cms_automation
-   ```
+# 2. Crear el entorno virtual
+python -m venv .venv
 
-2. **Crea y activa un entorno virtual**.
+# 3. Activar el entorno virtual
+.\.venv\Scripts\Activate.ps1
 
-   Bash / Linux / macOS:
+# 4. Actualizar pip e instalar dependencias
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate
-   ```
+# 5. Descargar navegadores de Playwright
+playwright install
+```
 
-   PowerShell (Windows):
+> Si PowerShell bloquea la ejecución del script de activación, ejecuta una sola vez `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`.
 
-   ```powershell
-   python -m venv .venv
-   .\.venv\Scripts\Activate.ps1
-   ```
+### Símbolo del sistema o Git Bash en Windows
 
-3. **Instala dependencias y navegadores de Playwright**:
+```bash
+# 1. Clonar el repositorio
+git clone <url-del-repositorio> cms_automation
+cd cms_automation
 
-   ```bash
-   python -m pip install --upgrade pip
-   python -m pip install -r requirements.txt
-   playwright install --with-deps
-   ```
+# 2. Crear el entorno virtual
+python -m venv .venv
 
-   `--with-deps` instala dependencias del sistema necesarias para Chromium/Firefox/WebKit. En Windows puedes omitirlo si ya cuentas con los navegadores.
+# 3. Activar el entorno virtual
+source .venv/Scripts/activate
+
+# 4. Actualizar pip e instalar dependencias
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+
+# 5. Descargar navegadores de Playwright
+playwright install
+```
+
+### Bash (Linux / macOS / WSL)
+
+```bash
+# 1. Clonar el repositorio
+git clone <url-del-repositorio> cms_automation
+cd cms_automation
+
+# 2. Crear el entorno virtual
+python -m venv .venv
+
+# 3. Activar el entorno virtual
+source .venv/bin/activate
+
+# 4. Actualizar pip e instalar dependencias
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+
+# 5. Descargar navegadores de Playwright (con dependencias del sistema)
+playwright install --with-deps
+```
+
+> En distribuciones Linux puede solicitar privilegios de superusuario para instalar dependencias del sistema. Ejecuta el comando con `sudo` solo si es necesario.
 
 ## Configuración del proyecto
 
-### Selección de entorno y archivo YAML
+### Descripción de la carpeta `config/`
 
-- La fixture `config` lee `config/<entorno>.yaml`. Por defecto se usa `config/qa.yaml`, pero puedes definir la variable `CMS_ENV` para apuntar a otro archivo (por ejemplo `CMS_ENV=prod`).
-- Cada YAML incluye la URL base, timeouts y credenciales por usuario. Crea archivos adicionales (`prod.yaml`, `staging.yaml`, etc.) siguiendo la misma estructura.
-- `ignore_https_errors: true` permite ejecutar en entornos con certificados no válidos; modifícalo si tu infraestructura requiere validar TLS.
+Los archivos YAML de `config/` definen parámetros por entorno. El archivo `config/qa.yaml` incluye por defecto:
+
+```yaml
+base_url: "https://..."
+timeout: 30000           # Tiempo de espera en milisegundos para acciones Playwright
+ignore_https_errors: true
+users:
+  admin:
+    username: "usuario"
+    password: "contraseña"
+```
+
+- **Selección de entorno**: la variable de entorno `CMS_ENV` determina qué archivo usar (por ejemplo, `CMS_ENV=staging` utilizaría `config/staging.yaml`). Si no se define, se carga `qa`.
+- **Usuarios**: declara los roles que utilizarán las pruebas (`admin`, `analyst`, etc.). Cada entrada debe contener `username` y `password`.
+- **Parámetros adicionales**: agrega claves personalizadas (por ejemplo `downloads_path`, `api_base_url`) según las necesidades del entorno. Mantén los comentarios y ejemplos actualizados para nuevos miembros del equipo.
 
 ### Credenciales y variables de entorno
 
-- Las credenciales se obtienen de `config/<entorno>.yaml` pero pueden sobrescribirse mediante variables de entorno como `ADMIN_USER` y `ADMIN_PASS`. Esta lógica está en la fixture `creds`.
-- Puedes crear un archivo `.env` en la raíz para cargar automáticamente las variables:
+- Las credenciales del YAML pueden sobrescribirse mediante variables de entorno (`ADMIN_USER`, `ADMIN_PASS`, etc.) o un archivo `.env` en la raíz.
+- Ejemplo de `.env` (no debe versionarse):
 
   ```env
   ADMIN_USER=usuario_admin
-  ADMIN_PASS=super-segura
+  ADMIN_PASS=clave-super-segura
+  CMS_ENV=qa
   ```
 
-  Recuerda **no versionar** archivos con credenciales reales.
+- El proyecto utiliza `python-dotenv`, por lo que las variables definidas se cargan automáticamente al ejecutar `pytest`.
 
 ### Datos de prueba
 
-- Algunos Page Objects (por ejemplo, `CM14TrazabilidadPage`) esperan archivos de datos. El método `load_cards_from_csv` busca `tests/data/cards.csv` con una columna `card_number`.
-- Crea el directorio y un CSV antes de ejecutar las pruebas:
+- Algunos flujos consumen archivos CSV ubicados en `tests/data/`. Crea la carpeta y el archivo `cards.csv` con una columna `card_number` si vas a ejecutar los escenarios de trazabilidad.
+- Ajusta los valores a tarjetas válidas en tu entorno para evitar falsos negativos.
 
-  ```csv
-  card_number
-  1234567890123456
-  6543210987654321
-  ```
+## Uso habitual
 
-- Ajusta los valores a tarjetas válidas en tu entorno.
+Con el entorno virtual activo, estos son los comandos principales:
 
-## Ejecución de pruebas
-
-Ejecuta los siguientes comandos desde la raíz del proyecto con el entorno virtual activo.
-
-- **Todas las pruebas end-to-end**:
+- **Ejecutar toda la suite end-to-end**:
 
   ```bash
   pytest tests/e2e
   ```
 
-- **Filtrar por marcador** (marcadores definidos en `pytest.ini`):
+- **Filtrar por marcador** (marcadores declarados en `pytest.ini`):
 
   ```bash
   pytest -m cm14
   pytest -m "cm14 or cm45"
+  pytest -m "not ws"
   ```
 
-- **Ejecutar un archivo o prueba concreta**:
+- **Ejecutar un archivo o una prueba específica**:
 
   ```bash
   pytest tests/e2e/test_cm14_trazabilidad_tarjetas.py
   pytest tests/e2e/test_cm14_trazabilidad_tarjetas.py::test_cm14_trazabilidad_tarjetas
   ```
 
-- **Modo con interfaz y cámara lenta** (útil para depuración):
+- **Depurar con interfaz visible y cámara lenta**:
 
   ```bash
   pytest --headed --slowmo 300 -m cm45
   ```
 
-- **Ejecución en paralelo** (requiere `pytest-xdist`):
+- **Ejecución en paralelo** (requiere instalar `pytest-xdist`):
 
   ```bash
   pytest -n auto -m "cm14 or cm60"
   ```
 
-- **Pruebas de servicios web**: actualmente `tests/api/` contiene esqueletos que realizan `pytest.skip`. Mantén estos archivos para completar cuando los endpoints estén disponibles.
+> Los archivos en `tests/api/` sirven como plantillas para futuras pruebas de servicios web. Actualmente se marcan con `pytest.skip` hasta que los endpoints estén disponibles.
 
 ## Reportes y evidencias
 
-- `pytest.ini` añade por defecto `--html=reports/report.html --self-contained-html`, por lo que cada corrida genera un reporte HTML independiente.
-- El hook `pytest_runtest_makereport` mueve las capturas y vídeos recientes a `artefacts/` y los adjunta en el reporte. Los vídeos se guardan en `videos/` gracias a `browser_context_args`.
-- Para generar reportes **Allure**:
+- `pytest.ini` añade por defecto `--html=reports/report.html --self-contained-html`, generando un reporte HTML independiente por ejecución.
+- El hook `pytest_runtest_makereport` centraliza capturas de pantalla y vídeos en `artefacts/` y adjunta los archivos relevantes al reporte.
+- Para generar reportes **Allure** (opcional):
 
   ```bash
   pytest --alluredir=reports/allure
   allure serve reports/allure
   ```
 
-  Asegúrate de tener Allure instalado localmente.
+  Asegúrate de tener Allure instalado localmente (`npm install -g allure-commandline` o instaladores oficiales).
 
 ## Estructura del repositorio
 
 ```
 cms_automation/
-├── config/                  # Archivos YAML por entorno (qa, prod, etc.)
-├── docs/                    # Documentación ampliada (guías de uso y arquitectura)
-├── pages/                   # Page Objects del CMS (login, menú y módulos CM)
+├── config/                  # Configuración por entorno (YAML, seleccionados con CMS_ENV)
+├── docs/                    # Guías detalladas y documentación de arquitectura
+├── pages/                   # Page Objects y helpers de navegación
 ├── tests/
-│   ├── e2e/                 # Pruebas end-to-end por módulo
-│   └── api/                 # Pruebas de servicios web (esqueletos)
-├── utils/                   # Selectores, waits, utilidades de archivos y autenticación
+│   ├── e2e/                 # Pruebas end-to-end por módulo del CMS
+│   └── api/                 # Plantillas para pruebas de servicios web
+├── utils/                   # Selectores, waits personalizados y utilidades varias
+├── fixtures/                # Datos compartidos para pruebas específicas
 ├── conftest.py              # Fixtures globales y hooks de pytest
-├── pytest.ini               # Marcadores y configuración de pytest
-├── requirements.txt         # Dependencias Python
+├── pytest.ini               # Marcadores y configuración general de pytest
+├── requirements.txt         # Dependencias Python del proyecto
 └── README.md                # Este documento
 ```
 
 ## Extender la automatización
 
-1. **Crear/actualizar el Page Object** del módulo en `pages/`, encapsulando acciones de negocio (búsquedas, exportaciones, validaciones).
+1. **Crear/actualizar el Page Object** del módulo en `pages/`, encapsulando acciones de negocio y selectores.
 2. **Agregar la prueba** correspondiente en `tests/e2e/`, reutilizando la fixture `login` para autenticarse y `MenuPage` para navegar.
-3. **Etiquetar con `@pytest.mark.cmXX`** para poder filtrar por módulo.
+3. **Definir o reutilizar un marcador `cmXX`** en `pytest.ini` para facilitar ejecuciones filtradas.
 4. **Centralizar selectores** en `utils/selectors.py` cuando se reutilicen en varias pantallas.
-5. **Actualizar la documentación** (`README.md` y `docs/`) para reflejar el nuevo alcance.
+5. **Actualizar la documentación** (`README.md`, `docs/`) cada vez que se incorpore un nuevo flujo.
 
 ## Documentación adicional
 
-- [`docs/usage.md`](docs/usage.md): guía paso a paso para configurar el entorno, ejecutar pruebas y revisar reportes.
-- [`docs/project_doc.md`](docs/project_doc.md): descripción arquitectónica, cobertura de módulos y convenciones de desarrollo.
+- [`docs/usage.md`](docs/usage.md): guía operativa paso a paso para configurar el entorno, ejecutar pruebas y revisar reportes.
+- [`docs/project_doc.md`](docs/project_doc.md): descripción arquitectónica, estado de los módulos y convenciones de desarrollo.
+- [`docs/improvement_checklist.md`](docs/improvement_checklist.md): lista de verificación con oportunidades de mejora priorizadas.
 
 ## Buenas prácticas
 
-- Prioriza el uso de atributos `data-testid` al definir selectores para mejorar la resiliencia ante cambios de UI.
-- Mantén los Page Objects pequeños y con responsabilidades claras; evita mezclar lógica de negocio con asserts complejos en los tests.
-- Crea datos de prueba controlados (CSV, fixtures parametrizadas) y evita depender de información sensible.
-- Limpia periódicamente los directorios `artefacts/`, `videos/` y `downloads/` para evitar acumular archivos pesados.
+- Prioriza selectores estables (`data-testid`, atributos semánticos) para reducir roturas por cambios de UI.
+- Mantén los Page Objects con responsabilidades acotadas; las aserciones complejas deben vivir en los tests o helpers.
+- Versiona únicamente datos ficticios. Las credenciales reales deben cargarse vía `.env` o variables de entorno.
+- Limpia periódicamente `artefacts/`, `videos/`, `reports/` y `downloads/` para evitar que crezcan en exceso.
+- Ejecuta `pytest` localmente antes de subir cambios o abrir un Pull Request.
 
-Con estas guías podrás ejecutar y extender la automatización del CMS de manera ordenada y reproducible. ¡Felices pruebas!
+Con esta guía tendrás una referencia completa para preparar el entorno, ejecutar las pruebas y extender la automatización del CMS con confianza.

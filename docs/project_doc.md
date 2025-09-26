@@ -50,10 +50,9 @@ La siguiente tabla resume el estado de automatización de los módulos de Consul
 | CM46 | Reporte de Lotes Pendientes | Implementado | `CM46LotesPendientesPage` (`pages/cm46_lotes_pendientes_page.py`) | `tests/e2e/test_cm46_reporte_lotes_pendientes.py` |
 | CM60 | Tarjetas Canceladas | Implementado | `CM60CanceladasPage` (`pages/cm60_canceladas_page.py`) | `tests/e2e/test_cm60_reporte_tarjetas_canceladas.py` |
 | CM85 | Reporte de Tarjetas Emitidas | Implementado | `CM85EmitidasPage` (`pages/cm85_emitidas_page.py`) | `tests/e2e/test_cm85_reporte_tarjetas_emitidas.py` |
-| Placeholders | CM17, CM87, CMA4, CM88, CM89, CM97, MD16 | Pendiente | Clases en `pages/placeholders.py` | `tests/e2e/test_placeholders.py` |
-| WS01 / WS02 | Servicios web del switch | Pendiente | No aplica | `tests/api/test_ws01_movimientos_switch.py`, `tests/api/test_ws02_consulta_transacciones.py`, `tests/api/test_ws02_consulta_transacciones_switch.py` |
+| WS01 / WS02 | Servicios web del switch | En diseño | No aplica | `tests/api/test_ws01_movimientos_switch.py`, `tests/api/test_ws02_consulta_transacciones.py`, `tests/api/test_ws02_consulta_transacciones_switch.py` |
 
-> Los módulos marcados como *pendiente* disponen de clases placeholder que abren el módulo desde el menú y lanzan `NotImplementedError` para recordar que falta la automatización.
+Los módulos no listados aún no tienen automatización. Antes de crear nuevos flujos verifica con el equipo funcional qué pantallas tienen mayor prioridad.
 
 ## 4. Componentes clave
 
@@ -62,7 +61,6 @@ La siguiente tabla resume el estado de automatización de los módulos de Consul
 - `LoginPage`: encapsula la navegación a la pantalla de login y la autenticación.
 - `MenuPage`: provee métodos `open_cmXX` para abrir cada módulo desde el buscador del menú principal. Internamente usa `_open_menu_item` y espera el `iframe` correspondiente.
 - Cada Page Object implementa métodos de interacción específicos (por ejemplo, `CM14TrazabilidadPage.run_all_from_csv` procesa tarjetas desde un CSV y captura reportes).
-- Los placeholders (`pages/placeholders.py`) comparten la lógica base `BasePlaceholderPage` que abre el módulo y lanza `NotImplementedError`.
 
 ### 4.2 Fixtures y hooks relevantes
 
@@ -98,19 +96,13 @@ La siguiente tabla resume el estado de automatización de los módulos de Consul
 4. Define un marcador en `pytest.ini` (`cmXX`) para facilitar la ejecución selectiva.
 5. Documenta el nuevo módulo en este archivo y en el README.
 
-### 5.2 Implementar un placeholder pendiente
-
-1. Actualiza la clase en `pages/placeholders.py` reemplazando la herencia de `BasePlaceholderPage` por un Page Object real.
-2. Completa la prueba específica en `tests/e2e/` y elimina la entrada correspondiente del `parametrize` en `test_placeholders.py`.
-3. Asegúrate de retirar la expectativa `NotImplementedError` y de añadir asserts reales.
-
-### 5.3 Pruebas de servicios web
+### 5.2 Pruebas de servicios web
 
 - Reutiliza `pytest` puro para WS01/WS02. Cuando los endpoints estén disponibles, utiliza `requests` o `playwright.sync_api.APIRequestContext`.
 - Define fixtures para tokens, cabeceras o payloads reutilizables.
 - Considera validar contratos con bibliotecas como `pydantic` o `jsonschema`.
 
-### 5.4 Buenas prácticas de mantenimiento
+### 5.3 Buenas prácticas de mantenimiento
 
 - Mantén los selectores en un único lugar (`selectors.py`) y anota en comentarios cuándo fue la última validación en producción/QA.
 - Documenta cualquier workaround temporal directamente en el Page Object con TODOs claros.
