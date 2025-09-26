@@ -5,4 +5,7 @@ users:
   admin:
     username: "205dnazareno"
     password: "P@sswo.2025++"
+  tester:
+    username: "205ccoro"
+    password: "P@sswo.2025+*"
 # Configura otras variables específicas del entorno QA según sea necesario

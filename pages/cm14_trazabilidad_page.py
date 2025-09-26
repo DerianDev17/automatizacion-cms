@@ -2,8 +2,7 @@
 Page Object para el módulo **CM14 – Trazabilidad de Tarjetas**.
 Según la guía operativa, este módulo permite rastrear la historia de cada
 tarjeta emitida, consultando eventos como emisión, renovación, reimpresión o
-suspensión【547172095933312†L194-L204】. La automatización de este módulo
-incluye la apertura desde el menú principal, la búsqueda de una tarjeta
+suspensión. La automatización de este módulo incluye la apertura desde el menú principal, la búsqueda de una tarjeta
 mediante su número y la validación de que se presentan resultados en la
 tabla.
 """
@@ -117,8 +116,8 @@ class CM14TrazabilidadPage:
         from pathlib import Path
         evid = Path(__file__).resolve().parent.parent / "evidencias"
         evid.mkdir(parents=True, exist_ok=True)
-        report_path = evid / f"screenshot_cm14_report_{numero_tarjeta}.png"
-        result_path = evid / f"screenshot_cm14_result_{numero_tarjeta}.png"
+        report_path = evid / f"screenshot_cm14_report.png"
+        result_path = evid / f"screenshot_cm14_result.png"
         self.imprimir_y_capturar_report(str(report_path), str(result_path))
 
     def run_all_from_csv(self, csv_path: str | None = None) -> None:

@@ -1,7 +1,7 @@
 """
 Page Object para el módulo **CM45 – Consulta de Tarjetas**. Permite
 consultar el estado de las tarjetas emitidas, suspendidas o canceladas
-mediante diferentes filtros (número de tarjeta, cliente, fecha, etc.)【547172095933312†L194-L202】.
+mediante diferentes filtros (número de tarjeta, cliente, fecha, etc.).
 """
 
 from playwright.sync_api import Page, expect
@@ -83,7 +83,7 @@ class CM45ConsultaPage:
             evidencias_dir = Path(__file__).resolve().parent.parent / "evidencias"
         evidencias_dir = Path(evidencias_dir)
         evidencias_dir.mkdir(parents=True, exist_ok=True)
-        target = evidencias_dir / f"screenshot_cm45_{card_number}.png"
+        target = evidencias_dir / f"screenshot_cm45.png"
         # Capturar en el directorio de evidencias
         self.page.screenshot(path=str(target), full_page=True)
 

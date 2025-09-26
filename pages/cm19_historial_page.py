@@ -1,7 +1,7 @@
 """
 Page Object para el módulo **CM19 – Historial de Tarjetas**. Permite
 consultar el historial de transacciones o estados de una tarjeta a lo
-largo del tiempo【547172095933312†L204-L208】.
+largo del tiempo.
 """
 
 from playwright.sync_api import Page, expect
@@ -146,8 +146,8 @@ class CM19HistorialPage:
         # ejecutar pasos
         self.buscar_por_numero(numero_tarjeta)
         self.set_fechas(fecha_inicio_str, fecha_fin_str)
-        self.imprimir_y_capturar_report(screenshot_report_path=f"screenshot_cm19_report_{numero_tarjeta}.png",
-                                        screenshot_result_path=f"screenshot_cm19_main_{numero_tarjeta}.png")
+        self.imprimir_y_capturar_report(screenshot_report_path=f"screenshot_cm19_report.png",
+                                        screenshot_result_path=f"screenshot_cm19_main.png")
         # validar que existan resultados en el frame
         try:
             self.validar_resultados(min_rows=1)
