@@ -13,8 +13,7 @@ Esta lista agrupa iniciativas que pueden planificarse para aumentar la robustez 
 
 - [ ] Priorizar con el equipo funcional los módulos de Consultas y Reportes que aún no tienen automatización.
 - [ ] Elaborar casos de prueba para WS01 y WS02 una vez que los endpoints estén disponibles.
-- [ ] Implementar el ciclo **Tarjetas nominadas** (CM01, CM10, CM07, CM03, CM02) reutilizando los stubs y workflows creados.
-- [ ] Implementar el ciclo **Tarjetas innominadas** (CM83, CM70, CM10, CM07, CM06) reutilizando los stubs y workflows creados.
+
 - [ ] Incorporar pruebas negativas (errores esperados, validaciones de permisos) en los módulos existentes.
 - [ ] Añadir validaciones de contenido descargado (por ejemplo, comparar CSVs o PDFs generados).
 

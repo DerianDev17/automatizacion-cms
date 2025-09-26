@@ -64,54 +64,7 @@ source .venv/Scripts/activate
 # 4. Actualizar pip e instalar dependencias
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
-
-# 5. Descargar navegadores de Playwright
-playwright install
-```
-
-### Bash (Linux / macOS / WSL)
-
-```bash
-# 1. Clonar el repositorio
-git clone <url-del-repositorio> cms_automation
-cd cms_automation
-
-# 2. Crear el entorno virtual
-python -m venv .venv
-
-# 3. Activar el entorno virtual
-source .venv/bin/activate
-
-# 4. Actualizar pip e instalar dependencias
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-
-# 5. Descargar navegadores de Playwright (con dependencias del sistema)
-playwright install --with-deps
-```
-
-> En distribuciones Linux puede solicitar privilegios de superusuario para instalar dependencias del sistema. Ejecuta el comando con `sudo` solo si es necesario.
-
-## Configuración del proyecto
-
-### Descripción de la carpeta `config/`
-
-Los archivos YAML de `config/` definen parámetros por entorno. El archivo `config/qa.yaml` incluye por defecto:
-
-```yaml
-base_url: "https://..."
-timeout: 30000           # Tiempo de espera en milisegundos para acciones Playwright
-ignore_https_errors: true
-users:
-  admin:
-    username: "usuario"
-    password: "contraseña"
-```
-
-- **Selección de entorno**: la variable de entorno `CMS_ENV` determina qué archivo usar (por ejemplo, `CMS_ENV=staging` utilizaría `config/staging.yaml`). Si no se define, se carga `qa`.
-- **Usuarios**: declara los roles que utilizarán las pruebas (`admin`, `analyst`, etc.). Cada entrada debe contener `username` y `password`.
-- **Parámetros adicionales**: agrega claves personalizadas (por ejemplo `downloads_path`, `api_base_url`) según las necesidades del entorno. Mantén los comentarios y ejemplos actualizados para nuevos miembros del equipo.
-
+<
 ### Credenciales y variables de entorno
 
 - Las credenciales del YAML pueden sobrescribirse mediante variables de entorno (`ADMIN_USER`, `ADMIN_PASS`, etc.) o un archivo `.env` en la raíz.
@@ -167,40 +120,7 @@ Con el entorno virtual activo, estos son los comandos principales:
   pytest -n auto -m "cm14 or cm60"
   ```
 
-> Los archivos en `tests/api/` sirven como plantillas para futuras pruebas de servicios web. Actualmente se marcan con `pytest.skip` hasta que los endpoints estén disponibles.
 
-## Ciclos de tarjetas en preparación
-
-Dos nuevos frentes de automatización —**Tarjetas nominadas** y **Tarjetas innominadas**— ya cuentan con andamiaje listo para
-integrar pruebas end-to-end sin afectar la suite existente. Toda la información del ciclo de vida se centraliza en
-`utils/workflows.py`, lo que evita duplicar descripciones y códigos de módulo.
-
-### Tarjetas nominadas
-
-- CM01. Solicitud de tarjeta – Ciclo vida Tarjeta nominada
-- CM10. Emisión de tarjetas – Ciclo vida Tarjeta nominada
-- CM07. Recepción de tarjetas – Ciclo vida Tarjeta nominada
-- CM03. Entrega de tarjetas – Ciclo vida Tarjeta nominada
-- CM02. Solicitud de tarjeta adicional – Ciclo vida Tarjeta nominada
-
-### Tarjetas innominadas
-
-- CM83. Cupos por oficina – Ciclo vida Tarjeta innominada
-- CM70. Solicitud de tarjetas innominadas – Ciclo vida Tarjeta innominada
-- CM10. Emisión de tarjetas – Ciclo vida Tarjeta innominada
-- CM07. Recepción de tarjetas – Ciclo vida Tarjeta innominada
-- CM06. Mantenimiento de tarjetas – Ciclo vida Tarjeta innominada
-
-Las pruebas esqueleto residen en `tests/e2e/ciclos/` y están marcadas con `@pytest.mark.skip(reason="pendiente implementación")`
-para no romper la ejecución actual. Cuando los flujos estén listos, elimina el `skip` y ejecuta de forma segmentada con:
-
-```bash
-pytest -m ciclo_nominada
-pytest -m ciclo_innominada
-```
-
-Los Page Objects asociados (estructura vacía) se encuentran en `pages/ciclos/ciclo_tarjeta.py` y cada función levanta
-`NotImplementedError` hasta que se agregue la lógica real.
 
 ## Reportes y evidencias
 
@@ -222,13 +142,7 @@ cms_automation/
 ├── config/                  # Configuración por entorno (YAML, seleccionados con CMS_ENV)
 ├── docs/                    # Guías detalladas y documentación de arquitectura
 ├── pages/                   # Page Objects y helpers de navegación
-│   └── ciclos/              # Stubs de los flujos Tarjetas_nominadas e innominadas
-├── tests/
-│   ├── e2e/                 # Pruebas end-to-end por módulo del CMS
-│   │   └── ciclos/          # Nuevos escenarios de ciclo de tarjetas (skip por ahora)
-│   └── api/                 # Plantillas para pruebas de servicios web
-├── utils/                   # Selectores, workflows y utilidades varias
-│   └── workflows.py         # Definición centralizada de los ciclos de tarjetas
+
 ├── fixtures/                # Datos compartidos para pruebas específicas
 ├── conftest.py              # Fixtures globales y hooks de pytest
 ├── pytest.ini               # Marcadores y configuración general de pytest

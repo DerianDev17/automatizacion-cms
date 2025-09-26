@@ -52,9 +52,6 @@ La siguiente tabla resume el estado de automatización de los módulos de Consul
 | CM85 | Reporte de Tarjetas Emitidas | Implementado | `CM85EmitidasPage` (`pages/cm85_emitidas_page.py`) | `tests/e2e/test_cm85_reporte_tarjetas_emitidas.py` |
 | WS01 / WS02 | Servicios web del switch | En diseño | No aplica | `tests/api/test_ws01_movimientos_switch.py`, `tests/api/test_ws02_consulta_transacciones.py`, `tests/api/test_ws02_consulta_transacciones_switch.py` |
 
-Además, se incorporaron esqueletos para los ciclos **Tarjetas nominadas** y **Tarjetas innominadas**. Los datos del flujo viven en
-`utils/workflows.py`, los Page Objects de referencia en `pages/ciclos/ciclo_tarjeta.py` y las pruebas (actualmente marcadas con
-`pytest.skip`) en `tests/e2e/ciclos/`.
 
 Los módulos no listados aún no tienen automatización. Antes de crear nuevos flujos verifica con el equipo funcional qué pantallas tienen mayor prioridad.
 

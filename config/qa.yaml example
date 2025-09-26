@@ -1,0 +1,8 @@
+base_url: "https://atmfrontqa2.coonecta.com.ec/ExtremeWebTs"
+timeout: 30000  # milisegundos
+ignore_https_errors: true
+users:
+  admin:
+    username: ""  # usuario del CMS
+    password: ""  # contraseña del CMS
+# Configura otras variables específicas del entorno QA según sea necesario
