@@ -4,43 +4,65 @@ Esta guía describe paso a paso cómo preparar el entorno, ejecutar las pruebas 
 
 ## 1. Preparar el entorno
 
-### 1.1 Clonar el repositorio
+### 1.1 Clonar el repositorio (por terminal)
 
-Se recomienda clonar el repositorio usando el nombre `cms_automation` para que los imports (`from cms_automation.pages...`) funcionen sin configuraciones adicionales.
+Se recomienda clonar el repositorio usando el nombre `cms_automation` para que los imports (`from cms_automation.pages...`) funcionen sin configuraciones adicionales. Elige la terminal que utilices:
 
-```bash
-git clone <url-del-repositorio> cms_automation
-cd cms_automation
-```
-
-En PowerShell:
+**PowerShell (Windows)**
 
 ```powershell
 git clone <url-del-repositorio> cms_automation
 Set-Location cms_automation
 ```
 
-> Si prefieres mantener otro nombre de carpeta, asegúrate de que Python pueda resolver el paquete `cms_automation`. Puedes crear un enlace simbólico o ajustar `PYTHONPATH` y los imports según convenga.
-
-### 1.2 Crear el entorno virtual
-
-Bash / Linux / macOS:
+**Símbolo del sistema o Git Bash (Windows)**
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
+git clone <url-del-repositorio> cms_automation
+cd cms_automation
 ```
 
-PowerShell (Windows):
+**Bash (Linux, macOS o WSL)**
+
+```bash
+git clone <url-del-repositorio> cms_automation
+cd cms_automation
+```
+
+> Si prefieres mantener otro nombre de carpeta, asegúrate de que Python pueda resolver el paquete `cms_automation`. Puedes crear un enlace simbólico o ajustar `PYTHONPATH` y los imports según convenga.
+
+### 1.2 Crear y activar el entorno virtual
+
+El siguiente bloque resume los comandos para cada terminal. En todos los casos el entorno virtual se creará en `.venv` dentro del proyecto.
+
+**PowerShell (Windows)**
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
+> Si PowerShell bloquea la ejecución del script de activación, ejecuta `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser` e inténtalo nuevamente.
+
+**Símbolo del sistema o Git Bash (Windows)**
+
+```bash
+python -m venv .venv
+source .venv/Scripts/activate
+```
+
+**Bash (Linux, macOS o WSL)**
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+Para salir del entorno virtual en cualquier terminal, ejecuta `deactivate`.
+
 ### 1.3 Instalar dependencias
 
-Con el entorno virtual activo, instala las librerías Python y los navegadores de Playwright:
+Con el entorno virtual activo, instala las librerías Python y los navegadores de Playwright. Ejecuta los comandos en la terminal correspondiente (el prefijo `python` utiliza el intérprete del entorno virtual):
 
 ```bash
 python -m pip install --upgrade pip
@@ -48,7 +70,7 @@ python -m pip install -r requirements.txt
 playwright install --with-deps
 ```
 
-En Windows, `--with-deps` es opcional. Ejecuta `playwright install` al menos una vez para que se descarguen los binarios necesarios.
+En Windows, `--with-deps` es opcional. Ejecuta `playwright install` al menos una vez para que se descarguen los binarios necesarios. Si el comando solicita privilegios de administrador en Linux, antepon `sudo` únicamente a `playwright install --with-deps`.
 
 ### 1.4 Configurar variables de entorno
 
