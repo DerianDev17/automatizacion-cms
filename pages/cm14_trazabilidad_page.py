@@ -114,15 +114,18 @@ class CM14TrazabilidadPage:
         el PDF y la vista final con 'Fin del Reporte'.
         """
         self.buscar_por_numero_en_frame(numero_tarjeta)
-        report_path = f"screenshot_cm14_report_{numero_tarjeta}.png"
-        result_path = f"screenshot_cm14_result_{numero_tarjeta}.png"
-        self.imprimir_y_capturar_report(report_path, result_path)
+        from pathlib import Path
+        evid = Path(__file__).resolve().parent.parent / "evidencias"
+        evid.mkdir(parents=True, exist_ok=True)
+        report_path = evid / f"screenshot_cm14_report_{numero_tarjeta}.png"
+        result_path = evid / f"screenshot_cm14_result_{numero_tarjeta}.png"
+        self.imprimir_y_capturar_report(str(report_path), str(result_path))
 
     def run_all_from_csv(self, csv_path: str | None = None) -> None:
         """Carga las tarjetas del CSV y ejecuta `run_for_card` para cada una.
 
-        Si ocurre un error en una tarjeta se propaga la excepción para que el
-        test falle, dejando evidencia parcial en `artefacts/` o en el working dir.
+    Si ocurre un error en una tarjeta se propaga la excepción para que el
+    test falle, dejando evidencia parcial en `evidencias/` o en el working dir.
         """
         cards = self.load_cards_from_csv(csv_path)
         if not cards:

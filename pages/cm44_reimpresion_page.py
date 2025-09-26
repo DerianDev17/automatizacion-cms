@@ -69,13 +69,19 @@ class CM44ReimpresionPage:
         # Esperar y verificar el mensaje de confirmación en la vista principal
         frame.wait_for_selector("text=Impresion se realizo Correctamente", timeout=30_000)
         self.page.wait_for_timeout(1_000)
-        self.page.screenshot(path=screenshot_confirmation, full_page=True)
+        from pathlib import Path
+        evid = Path(__file__).resolve().parent.parent / "evidencias"
+        evid.mkdir(parents=True, exist_ok=True)
+        conf_path = evid / screenshot_confirmation
+        # Capturar la confirmación en la vista principal
+        self.page.screenshot(path=str(conf_path), full_page=True)
 
-        # Esperar a que el PDF cargue y tomar screenshot
+        # Esperar a que el PDF cargue y tomar screenshot del popup
         popup.wait_for_load_state("load")
         popup.wait_for_timeout(1_000)
         try:
-            popup.screenshot(path=screenshot_report, full_page=True)
+            rpt_path = evid / screenshot_report
+            popup.screenshot(path=str(rpt_path), full_page=True)
         except Exception:
             pass
 

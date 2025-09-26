@@ -71,19 +71,20 @@ class CM45ConsultaPage:
     def validar_resultados(self, min_rows: int = 1) -> None:
         expect(self.page.locator("table tr")).to_have_count(at_least=min_rows)
 
-    def run_for_card_and_capture(self, card_number: str, artefacts_dir: str | None = None) -> None:
-        """Busca tarjeta en el iframe, continúa, espera boton Salir y captura screenshot en artefacts."""
+    def run_for_card_and_capture(self, card_number: str, evidencias_dir: str | None = None) -> None:
+        """Busca tarjeta en el iframe, continúa, espera boton Salir y captura screenshot en 'evidencias'."""
         frame = self._get_frame()
         self.buscar_por_tarjeta(card_number)
         self.continuar()
         self.esperar_boton_salir(timeout=15_000)
-        # crear directorio artefacts si se pidió
+        # crear directorio evidencias si se pidió
         from pathlib import Path
-        if artefacts_dir is None:
-            artefacts_dir = Path(__file__).resolve().parent.parent / "artefacts"
-        artefacts_dir = Path(artefacts_dir)
-        artefacts_dir.mkdir(parents=True, exist_ok=True)
-        target = artefacts_dir / f"screenshot_cm45_{card_number}.png"
+        if evidencias_dir is None:
+            evidencias_dir = Path(__file__).resolve().parent.parent / "evidencias"
+        evidencias_dir = Path(evidencias_dir)
+        evidencias_dir.mkdir(parents=True, exist_ok=True)
+        target = evidencias_dir / f"screenshot_cm45_{card_number}.png"
+        # Capturar en el directorio de evidencias
         self.page.screenshot(path=str(target), full_page=True)
 
     def run_all_from_csv(self, csv_path: str | None = None) -> None:

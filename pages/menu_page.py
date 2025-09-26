@@ -72,6 +72,15 @@ class MenuPage:
         """Abre el módulo CM85 – Reporte de Tarjetas Emitidas."""
         self._open_menu_item("CM85")
 
+    # Métodos para módulos de switch (WS)
+    def open_ws01(self) -> None:
+        """Abre el módulo WS01 – Movimientos del Switch."""
+        self._open_menu_item("WS01")
+
+    def open_ws02(self) -> None:
+        """Abre el módulo WS02 – Consulta de Transacciones Switch."""
+        self._open_menu_item("WS02")
+
     # Métodos adicionales para módulos sin automatización implementada
     def open_cm87(self) -> None:
         self._open_menu_item("CM87")

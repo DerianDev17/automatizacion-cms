@@ -94,17 +94,48 @@ class CM60CanceladasPage:
 
         btn_aceptar = frame.locator("#ctl00_maincontent_BtnImprimir")
         btn_aceptar.wait_for(state="visible", timeout=15_000)
-        with self.page.expect_popup() as popup_info:
-            btn_aceptar.click()
-        report = popup_info.value
-
-        report.wait_for_load_state("load")
-        report.wait_for_timeout(1_000)
+        # Intentar capturar el popup PDF; si no aparece, usar fallback
         try:
-            report.screenshot(path=screenshot_report, full_page=True)
+            with self.page.expect_popup(timeout=15_000) as popup_info:
+                btn_aceptar.click()
+            report = popup_info.value
+
+            report.wait_for_load_state("load")
+            report.wait_for_timeout(1_000)
+            try:
+                from pathlib import Path
+                evid = Path(__file__).resolve().parent.parent / "evidencias"
+                evid.mkdir(parents=True, exist_ok=True)
+                rpt_path = evid / screenshot_report
+                report.screenshot(path=str(rpt_path), full_page=True)
+            except Exception:
+                pass
+            finally:
+                try:
+                    report.close()
+                except Exception:
+                    pass
         except Exception:
-            pass
-        report.close()
+            # Fallback: quizá el PDF se incrusta en la página o no abre popup
+            try:
+                from pathlib import Path
+                evid = Path(__file__).resolve().parent.parent / "evidencias"
+                evid.mkdir(parents=True, exist_ok=True)
+                # buscar elementos que contengan PDF embebido
+                pdf_el = self.page.query_selector("iframe[src*='.pdf'], embed[type='application/pdf'], object[type='application/pdf']")
+                if pdf_el:
+                    rpt_path = evid / screenshot_report
+                    try:
+                        pdf_el.screenshot(path=str(rpt_path))
+                    except Exception:
+                        # si el elemento no admite screenshot, capturar la página completa
+                        self.page.screenshot(path=str(rpt_path), full_page=True)
+                else:
+                    # Capturar la página principal como último recurso
+                    rpt_path = evid / screenshot_report
+                    self.page.screenshot(path=str(rpt_path), full_page=True)
+            except Exception:
+                pass
 
         # volver al tab principal y asegurar el estado final
         self.page.bring_to_front()
@@ -119,7 +150,11 @@ class CM60CanceladasPage:
 
         self.page.wait_for_timeout(1_000)
         try:
-            self.page.screenshot(path=screenshot_result, full_page=True)
+            from pathlib import Path
+            evid = Path(__file__).resolve().parent.parent / "evidencias"
+            evid.mkdir(parents=True, exist_ok=True)
+            res_path = evid / screenshot_result
+            self.page.screenshot(path=str(res_path), full_page=True)
         except Exception:
             pass
 

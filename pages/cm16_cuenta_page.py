@@ -52,7 +52,14 @@ class CM16CuentaPage:
         report_page.wait_for_load_state("load")
         report_page.wait_for_timeout(1_000)
         try:
-            report_page.screenshot(path=screenshot_report, full_page=True)
+            from pathlib import Path
+            evid = Path(__file__).resolve().parent.parent / "evidencias"
+            evid.mkdir(parents=True, exist_ok=True)
+            rpt_path = evid / screenshot_report
+            from pathlib import Path
+            evid = Path(__file__).resolve().parent.parent / "evidencias"
+            evid.mkdir(parents=True, exist_ok=True)
+            report_page.screenshot(path=str(evid / rpt_path.name), full_page=True)
         except Exception:
             pass
         report_page.close()

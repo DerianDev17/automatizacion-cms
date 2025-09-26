@@ -100,21 +100,21 @@ def browser_context_args(browser_context_args: dict) -> dict:
 
 # --- ⬇️ Configuración para adjuntar capturas y vídeos al reporte HTML ---
 
-# Directorio donde se moverán los artefactos generados por cada test. Esto
+# Directorio donde se moverán las evidencias generadas por cada test. Esto
 # incluye capturas de pantalla (cuyos nombres comiencen por ``screenshot_``)
 # y vídeos (cuyos nombres comiencen por ``video_``). Si el directorio no
 # existe, se crea automáticamente.
-ARTEFACTS_DIR = Path("artefacts")
-ARTEFACTS_DIR.mkdir(exist_ok=True)
+EVIDENCIAS_DIR = Path("evidencias")
+EVIDENCIAS_DIR.mkdir(exist_ok=True)
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):
     """
     Después de la ejecución de cada test, este hook comprueba si se han
     generado nuevos archivos de captura o vídeo y los mueve al directorio
-    ``artefacts``. A continuación, adjunta automáticamente estos archivos
-    al reporte HTML a través de la API de pytest‑html. Se considera que un
-    artefacto es nuevo si su fecha de modificación es inferior a 5 minutos
+    ``evidencias``. A continuación, adjunta automáticamente estos archivos
+    al reporte HTML a través de la API de pytest‑html. Se considera que una
+    evidencia es nueva si su fecha de modificación es inferior a 5 minutos
     respecto del momento de la prueba.
     """
     outcome = yield
@@ -141,15 +141,15 @@ def pytest_runtest_makereport(item, call):
         for archivo in glob.glob(patron):
             # Comprueba si el archivo es reciente
             if ahora - os.path.getmtime(archivo) < 300:
-                destino = ARTEFACTS_DIR / os.path.basename(archivo)
-                # Solo copia si no existe ya una versión en artefacts
+                destino = EVIDENCIAS_DIR / os.path.basename(archivo)
+                # Solo mueve si no existe ya una versión en evidencias
                 if not destino.exists():
                     Path(archivo).rename(destino)
                 # Determina si es imagen o vídeo para adjuntar correctamente
-                if destino.suffix.lower() in {".png", ".jpg", ".jpeg"}:
-                    rep.extra.append(extras.image(destino, name=destino.name))
-                else:
-                    rep.extra.append(extras.video(destino, name=destino.name))
+                    if destino.suffix.lower() in {".png", ".jpg", ".jpeg"}:
+                        rep.extra.append(extras.image(destino, name=destino.name))
+                    else:
+                        rep.extra.append(extras.video(destino, name=destino.name))
 
 
 @pytest.fixture(scope="function")

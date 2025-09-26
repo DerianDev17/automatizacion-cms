@@ -88,7 +88,14 @@ class CM21ClavePage:
         report.wait_for_load_state("load")
         report.wait_for_timeout(1_000)
         try:
-            report.screenshot(path=screenshot_report_path, full_page=True)
+            from pathlib import Path
+            evid = Path(__file__).resolve().parent.parent / "evidencias"
+            evid.mkdir(parents=True, exist_ok=True)
+            report_path = evid / screenshot_report_path
+            from pathlib import Path
+            evid = Path(__file__).resolve().parent.parent / "evidencias"
+            evid.mkdir(parents=True, exist_ok=True)
+            report.screenshot(path=str(evid / report_path.name), full_page=True)
         except Exception:
             pass
         report.close()

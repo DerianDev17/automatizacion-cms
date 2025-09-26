@@ -65,7 +65,11 @@ class CM85EmitidasPage:
         report.wait_for_load_state("load")
         report.wait_for_timeout(1_000)
         try:
-            report.screenshot(path=screenshot_report, full_page=True)
+            from pathlib import Path
+            evid = Path(__file__).resolve().parent.parent / "evidencias"
+            evid.mkdir(parents=True, exist_ok=True)
+            rpt_path = evid / screenshot_report
+            report.screenshot(path=str(rpt_path), full_page=True)
         except Exception:
             pass
         report.close()

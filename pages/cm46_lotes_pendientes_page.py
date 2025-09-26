@@ -79,11 +79,19 @@ class CM46LotesPendientesPage:
             try:
                 frame.wait_for_selector("text=No existen tarjetas Pendientes.", timeout=2_000)
                 # evidencia
-                self.page.screenshot(path=screenshot_result, full_page=True)
+                from pathlib import Path
+                evid = Path(__file__).resolve().parent.parent / "evidencias"
+                evid.mkdir(parents=True, exist_ok=True)
+                res_path = evid / screenshot_result
+                self.page.screenshot(path=str(res_path), full_page=True)
                 return
             except Exception:
                 # tomar captura y fallar
-                self.page.screenshot(path=screenshot_result, full_page=True)
+                from pathlib import Path
+                evid = Path(__file__).resolve().parent.parent / "evidencias"
+                evid.mkdir(parents=True, exist_ok=True)
+                res_path = evid / screenshot_result
+                self.page.screenshot(path=str(res_path), full_page=True)
                 raise
 
     def load_cards_from_csv(self, csv_path: str | None = None) -> list:
@@ -141,6 +149,10 @@ class CM46LotesPendientesPage:
         # Si no se pudo localizar el botón, continuar sin fallo pero registrar captura
         if not tried:
             try:
-                self.page.screenshot(path="screenshot_cm46_no_export_button.png", full_page=True)
+                from pathlib import Path
+                evid = Path(__file__).resolve().parent.parent / "evidencias"
+                evid.mkdir(parents=True, exist_ok=True)
+                noexp = evid / "screenshot_cm46_no_export_button.png"
+                self.page.screenshot(path=str(noexp), full_page=True)
             except Exception:
                 pass
