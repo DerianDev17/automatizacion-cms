@@ -52,6 +52,7 @@ La siguiente tabla resume el estado de automatización de los módulos de Consul
 | CM85 | Reporte de Tarjetas Emitidas | Implementado | `CM85EmitidasPage` (`pages/cm85_emitidas_page.py`) | `tests/e2e/test_cm85_reporte_tarjetas_emitidas.py` |
 | WS01 / WS02 | Servicios web del switch | En diseño | No aplica | `tests/api/test_ws01_movimientos_switch.py`, `tests/api/test_ws02_consulta_transacciones.py`, `tests/api/test_ws02_consulta_transacciones_switch.py` |
 
+
 Los módulos no listados aún no tienen automatización. Antes de crear nuevos flujos verifica con el equipo funcional qué pantallas tienen mayor prioridad.
 
 ## 4. Componentes clave
@@ -78,6 +79,7 @@ Los módulos no listados aún no tienen automatización. Antes de crear nuevos f
 - `waits.py`: helpers para esperar spinners (`wait_for_spinner`) o descargas (`wait_for_download`).
 - `files.py`: función `save_download` para almacenar archivos descargados con Playwright.
 - `auth.py`: marcador para futuras extensiones de autenticación (renovación de sesión vía API).
+- `workflows.py`: catálogo centralizado de los pasos CMxx para los ciclos de tarjetas nominadas e innominadas.
 
 ### 4.4 Estructura de datos y evidencias
 

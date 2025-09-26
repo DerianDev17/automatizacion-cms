@@ -13,6 +13,7 @@ Esta lista agrupa iniciativas que pueden planificarse para aumentar la robustez 
 
 - [ ] Priorizar con el equipo funcional los módulos de Consultas y Reportes que aún no tienen automatización.
 - [ ] Elaborar casos de prueba para WS01 y WS02 una vez que los endpoints estén disponibles.
+
 - [ ] Incorporar pruebas negativas (errores esperados, validaciones de permisos) en los módulos existentes.
 - [ ] Añadir validaciones de contenido descargado (por ejemplo, comparar CSVs o PDFs generados).
 
