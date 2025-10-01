@@ -163,6 +163,7 @@ cms_automation/
 - [`docs/usage.md`](docs/usage.md): guía operativa paso a paso para configurar el entorno, ejecutar pruebas y revisar reportes.
 - [`docs/project_doc.md`](docs/project_doc.md): descripción arquitectónica, estado de los módulos y convenciones de desarrollo.
 - [`docs/improvement_checklist.md`](docs/improvement_checklist.md): lista de verificación con oportunidades de mejora priorizadas.
+- [`docs/collaboration_workflow.md`](docs/collaboration_workflow.md): flujo de colaboración, versionado y rollback para el equipo.
 
 ## Buenas prácticas
 
