@@ -116,5 +116,6 @@ Los módulos no listados aún no tienen automatización. Antes de crear nuevos f
 - [`README.md`](../README.md): resumen general y pasos rápidos de instalación.
 - [`docs/usage.md`](usage.md): instrucciones operativas detalladas para ejecutar la suite.
 - Código fuente de Page Objects y pruebas (`pages/`, `tests/`) para ejemplos concretos de implementación.
+- [`docs/collaboration_workflow.md`](collaboration_workflow.md): flujo recomendado de colaboración, versionado y rollback.
 
 Mantener esta documentación actualizada cada vez que se incorpora un nuevo módulo o se modifica un flujo es clave para conservar la trazabilidad del proyecto y facilitar la incorporación de nuevos miembros al equipo.
