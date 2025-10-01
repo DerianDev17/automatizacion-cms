@@ -7,10 +7,21 @@ from playwright.sync_api import Page
 
 
 def cm01_solicitud_tarjeta_nominada(page: Page) -> None:
-    """Ejecuta CM01 – Solicitud de tarjeta para el ciclo nominada."""
-
-    raise NotImplementedError("Pendiente: CM01 Solicitud de tarjeta nominada")
-
+    """
+    Ejecuta CM01 – Solicitud de tarjeta para el ciclo nominada:
+      - Abrir CM01
+      - Buscar por Nombre (PEREZ / JUAN) como ejemplo de prueba
+      - Seleccionar primer resultado
+      - Editar redes / Update / marcar y Continuar
+      - Validar pestañas 'Generales' y 'Autorizaciones'
+    """
+    cm01 = CM01Page(page)
+    cm01.open()
+    cm01.select_buscar_por("Consulta Por Nombre")
+    cm01.consultar_por_nombre(apellidos="PEREZ", nombres="JUAN")
+    cm01.seleccionar_primer_resultado()
+    cm01.editar_redes_y_continuar()
+    cm01.should_show_tabs_generales_autorizaciones()
 
 def cm10_emision_tarjetas_nominada(page: Page) -> None:
     """Ejecuta CM10 – Emisión de tarjetas para el ciclo nominada."""
